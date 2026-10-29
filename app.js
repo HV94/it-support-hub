@@ -223,7 +223,6 @@ const DEFAULT_ASSETS = [
   }
 ];
 
-/* TO BE ADDED IN NEXT UPDATE */
 const POWERSHELL_TOOLS = [
   {
     id: "tool-spooler",
