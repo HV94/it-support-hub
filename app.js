@@ -92,8 +92,9 @@ const DEFAULT_ASSETS = [
   {
     id: "AST-001",
     hostname: "W11-HR-02",
-    type: "PC Desktop",
+    type: "PC Desktop Micro",
     icon: "🖥️",
+    image: "assets_images/asset-1.jpg",
     model: "Dell OptiPlex 7090 Micro",
     serial: "7XG81P3",
     user: "Chiara Fontana",
@@ -106,8 +107,9 @@ const DEFAULT_ASSETS = [
   {
     id: "AST-002",
     hostname: "W11-COMM-04",
-    type: "Laptop / Notebook",
+    type: "Laptop Aziendale",
     icon: "💻",
+    image: "assets_images/asset-2.jpg",
     model: "HP EliteBook 840 G9",
     serial: "5CD23910KL",
     user: "Roberto De Angelis",
@@ -120,14 +122,15 @@ const DEFAULT_ASSETS = [
   {
     id: "AST-003",
     hostname: "W11-STK-01",
-    type: "Laptop / Notebook",
-    icon: "📦",
+    type: "Laptop Scorta Muletto",
+    icon: "💼",
+    image: "assets_images/asset-3.jpg",
     model: "Lenovo ThinkPad T14 Gen 3",
     serial: "PF3Z98AA",
-    user: "Magazzino IT (Scorta muletto)",
+    user: "Magazzino IT (Pronto Muletto)",
     department: "Supporto Informatico",
     location: "Armadio Laboratorio IT",
-    ip: "DHCP Dinamico",
+    ip: "192.168.1.150 (DHCP)",
     status: "Scorta Magazzino",
     specs: "AMD Ryzen 5 Pro 6650U, 16GB RAM, SSD 512GB, Configurato e pronto per nuova assunzione"
   },
@@ -136,6 +139,7 @@ const DEFAULT_ASSETS = [
     hostname: "PRN-KYO-ADM01",
     type: "Stampante Multifunzione",
     icon: "🖨️",
+    image: "assets_images/asset-4.jpg",
     model: "Kyocera TASKalfa 3253ci",
     serial: "Q8A1904512",
     user: "Condivisa Ufficio Contabilità",
@@ -148,22 +152,23 @@ const DEFAULT_ASSETS = [
   {
     id: "AST-005",
     hostname: "SW-CISCO-FL1",
-    type: "Apparato di Rete",
+    type: "Switch di Rete Rack",
     icon: "🌐",
+    image: "assets_images/asset-5.jpg",
     model: "Cisco Catalyst 1000 24P PoE+",
     serial: "FOC241908LK",
     user: "Infrastruttura Rete LAN",
     department: "Sistemi & Rete",
     location: "Armadio Rack CED - Piano 1",
-    ip: "192.168.1.2",
+    ip: "192.168.1.2 (Statico)",
     status: "In Uso",
     specs: "Switch gestito Layer 2, 24 porte Gigabit Ethernet PoE+, 4 porte SFP fibra"
   }
 ];
 
 // 3. STATO APPLICAZIONE (con persistenza localStorage)
-let tickets = loadData("it_tickets_v2", DEFAULT_TICKETS);
-let assets = loadData("it_assets_v2", DEFAULT_ASSETS);
+let tickets = loadData("it_tickets_v3", DEFAULT_TICKETS);
+let assets = loadData("it_assets_v3", DEFAULT_ASSETS);
 let currentFilterStatus = "all";
 let activeTicketId = null;
 
@@ -178,8 +183,8 @@ function loadData(key, fallback) {
 
 function saveData() {
   try {
-    localStorage.setItem("it_tickets_v2", JSON.stringify(tickets));
-    localStorage.setItem("it_assets_v2", JSON.stringify(assets));
+    localStorage.setItem("it_tickets_v3", JSON.stringify(tickets));
+    localStorage.setItem("it_assets_v3", JSON.stringify(assets));
   } catch (e) {
     console.error("Errore salvataggio localStorage:", e);
   }
@@ -404,11 +409,14 @@ function renderAssetsGrid() {
 
     return `
       <div class="asset-card">
-        <div class="asset-card-top">
-          <div class="asset-icon-box">${a.icon || '💻'}</div>
-          ${statusBadge}
+        <div class="asset-image-container">
+          <img src="${a.image || 'assets_images/asset-1.jpg'}" alt="${a.model}" class="asset-photo" loading="lazy">
+          <span class="asset-icon-pill">${a.icon || '💻'}</span>
+          <div class="asset-status-pill-overlay">${statusBadge}</div>
         </div>
-        <div class="asset-hostname">${a.hostname}</div>
+        <div class="asset-card-top" style="margin-bottom: 0.35rem;">
+          <div class="asset-hostname">${a.hostname}</div>
+        </div>
         <div class="asset-model">${a.model}</div>
 
         <div class="asset-details-list">
