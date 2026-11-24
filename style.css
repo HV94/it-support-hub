@@ -1048,4 +1048,25 @@ html, body {
   .kpi-subtext {
     font-size: 10px;
   }
+  .table-responsive {
+    position: relative;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-responsive::after {
+    content: "Scorri orizzontalmente per vedere tutti i campi \2192";
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-top: 1px dashed var(--border-color);
+  }
+  .data-table {
+    min-width: 580px;
+  }
 }
