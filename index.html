@@ -4,748 +4,476 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Pannello Supporto IT - Assistenza L1 & Inventario Hardware</title>
+  <title>Pannello Supporto IT & Help Desk L1 - Valentyn Haidukov</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Sidebar Laterale Enterprise -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <rect x="2" y="3" width="20" height="14" rx="2" stroke-width="2"/>
-            <line x1="8" y1="21" x2="16" y2="21" stroke-width="2"/>
-            <line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/>
-          </svg>
-          <span>Pannello Supporto IT</span>
-        </div>
-        <div class="brand-subtitle">Servizio Sistemi Informativi</div>
-      </div>
-
-      <div class="operator-badge">
-        <div class="operator-role">Presidio Help Desk L1</div>
-        <div class="operator-name">Valentyn Haidukov</div>
-        <div class="operator-status">
-          <span class="status-dot"></span>
-          <span>Operatore in Servizio</span>
+  <!-- Header Superiore -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">💻</div>
+        <div>
+          <h1 class="brand-title">Pannello Supporto IT & Help Desk L1</h1>
+          <p class="brand-subtitle">Gestione Ticket Assistenza &bull; Inventario Hardware &bull; Risoluzione Disservizi</p>
         </div>
       </div>
 
-      <nav class="sidebar-nav">
-        <div class="nav-section-title">Supporto Client</div>
-        <a class="nav-item active" data-view="dashboard">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect x="3" y="3" width="7" height="9" stroke-width="2"/>
-              <rect x="14" y="3" width="7" height="5" stroke-width="2"/>
-              <rect x="14" y="12" width="7" height="9" stroke-width="2"/>
-              <rect x="3" y="16" width="7" height="5" stroke-width="2"/>
-            </svg>
-            <span>Riepilogo</span>
-          </div>
-        </a>
-
-        <a class="nav-item" data-view="tickets">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="2"/>
-              <polyline points="22,6 12,13 2,6" stroke-width="2"/>
-            </svg>
-            <span>Registro Ticket</span>
-          </div>
-          <span class="nav-badge" id="sidebar-open-tickets-count">0</span>
-        </a>
-
-        <a class="nav-item" data-view="assets">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect x="2" y="2" width="20" height="8" rx="2" stroke-width="2"/>
-              <rect x="2" y="14" width="20" height="8" rx="2" stroke-width="2"/>
-              <line x1="6" y1="6" x2="6.01" y2="6" stroke-width="2"/>
-              <line x1="6" y1="18" x2="6.01" y2="18" stroke-width="2"/>
-            </svg>
-            <span>Inventario Macchine</span>
-          </div>
-        </a>
-
-        <div class="nav-section-title">Strumenti Tecnico</div>
-        <a class="nav-item" data-view="toolkit">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polyline points="4 17 10 11 4 5" stroke-width="2"/>
-              <line x1="12" y1="19" x2="20" y2="19" stroke-width="2"/>
-            </svg>
-            <span>Comandi PowerShell</span>
-          </div>
-        </a>
-
-        <div class="nav-section-title">Dati & Backup</div>
-        <a class="nav-item" id="btn-export-data">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"/>
-              <polyline points="7 10 12 15 17 10" stroke-width="2"/>
-              <line x1="12" y1="15" x2="12" y2="3" stroke-width="2"/>
-            </svg>
-            <span>Esporta Backup (JSON)</span>
-          </div>
-        </a>
-        <a class="nav-item" id="btn-reset-demo" style="color: #f87171;">
-          <div class="nav-item-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke-width="2"/>
-              <path d="M21 3v5h-5" stroke-width="2"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke-width="2"/>
-              <path d="M3 21v-5h5" stroke-width="2"/>
-            </svg>
-            <span>Ripristina Dati Iniziali</span>
-          </div>
-        </a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="system-status-indicator">
-          <span>Dominio Active Directory</span>
-          <span>CORP.LOCAL</span>
-        </div>
-        <div class="system-status-indicator">
-          <span>Tenant Microsoft 365</span>
-          <span>Sincronizzato</span>
+      <div class="operator-profile">
+        <div class="operator-avatar">VH</div>
+        <div class="operator-info">
+          <div class="operator-name">Valentyn Haidukov</div>
+          <div class="operator-role">Help Desk L1 &bull; <span class="status-badge-online">In Servizio</span></div>
         </div>
       </div>
-    </aside>
-
-    <!-- Wrapper Principale -->
-    <div class="main-wrapper">
-      <!-- Top Header -->
-      <header class="top-header">
-        <div class="header-left">
-          <h1 class="page-title" id="page-title">Pannello Assistenza & Ticket</h1>
-          <div class="header-search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <circle cx="11" cy="11" r="8" stroke-width="2"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"/>
-            </svg>
-            <input type="text" id="global-search-input" placeholder="Cerca ticket, matricola, hostname o utente...">
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <button class="btn btn-secondary btn-sm" id="btn-quick-new-ticket">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/>
-              <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/>
-            </svg>
-            <span>Nuovo Ticket</span>
-          </button>
-          <button class="btn btn-primary btn-sm" id="btn-quick-new-asset">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/>
-              <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/>
-            </svg>
-            <span>Registra Asset</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Area Contenuti -->
-      <main class="content-area">
-        <!-- VISTA 1: DASHBOARD -->
-        <section id="view-dashboard" class="view-section active">
-          <!-- KPI Cards -->
-          <div class="kpi-grid">
-            <div class="kpi-card kpi-card-blue">
-              <div class="kpi-header">
-                <span class="kpi-label">Ticket da Risolvere</span>
-              </div>
-              <div class="kpi-value" id="kpi-open-tickets">0</div>
-              <div class="kpi-subtext" id="kpi-open-subtext">Richieste in attesa di intervento</div>
-            </div>
-
-            <div class="kpi-card kpi-card-red">
-              <div class="kpi-header">
-                <span class="kpi-label">Priorità Alta / Critica</span>
-              </div>
-              <div class="kpi-value" id="kpi-critical-tickets">0</div>
-              <div class="kpi-subtext">Postazioni bloccate o disservizi di rete</div>
-            </div>
-
-            <div class="kpi-card kpi-card-green">
-              <div class="kpi-header">
-                <span class="kpi-label">Postazioni Censite</span>
-              </div>
-              <div class="kpi-value" id="kpi-total-assets">0</div>
-              <div class="kpi-subtext" id="kpi-active-assets-sub">0 postazioni attive in azienda</div>
-            </div>
-
-            <div class="kpi-card kpi-card-amber">
-              <div class="kpi-header">
-                <span class="kpi-label">Macchine a Magazzino</span>
-              </div>
-              <div class="kpi-value" id="kpi-stock-assets">0</div>
-              <div class="kpi-subtext">Pronte per nuova configurazione utente</div>
-            </div>
-          </div>
-
-          <!-- Colonne Dashboard -->
-          <div class="dashboard-columns">
-            <!-- Pannello Ticket Urgenti -->
-            <div class="panel">
-              <div class="panel-header">
-                <div class="panel-title">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
-                    <polyline points="12 6 12 12 16 14" stroke-width="2"/>
-                  </svg>
-                  <span>Coda Richieste Prioritarie & In Corso</span>
-                </div>
-                <button class="btn btn-secondary btn-sm" id="btn-goto-tickets">Vedi Tutti i Ticket</button>
-              </div>
-              <div class="panel-body">
-                <div class="table-responsive">
-                  <table class="data-table" id="dashboard-tickets-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Utente / Reparto</th>
-                        <th>Oggetto Richiesta</th>
-                        <th>Priorità</th>
-                        <th>Stato</th>
-                        <th>Azione</th>
-                      </tr>
-                    </thead>
-                    <tbody id="dashboard-tickets-tbody">
-                      <!-- Popolato via JS -->
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pannello Asset & Alert Hardware -->
-            <div>
-              <div class="panel">
-                <div class="panel-header">
-                  <div class="panel-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <rect x="2" y="2" width="20" height="8" rx="2" stroke-width="2"/>
-                      <rect x="2" y="14" width="20" height="8" rx="2" stroke-width="2"/>
-                      <line x1="6" y1="6" x2="6.01" y2="6" stroke-width="2"/>
-                      <line x1="6" y1="18" x2="6.01" y2="18" stroke-width="2"/>
-                    </svg>
-                    <span>Riepilogo Asset per Tipo</span>
-                  </div>
-                </div>
-                <div class="panel-body panel-body-padded" id="dashboard-asset-breakdown">
-                  <!-- Breakdown progress/bars -->
-                </div>
-              </div>
-
-              <div class="panel">
-                <div class="panel-header">
-                  <div class="panel-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke-width="2"/>
-                    </svg>
-                    <span>Azioni Rapide Help Desk</span>
-                  </div>
-                </div>
-                <div class="panel-body panel-body-padded">
-                  <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button class="btn btn-secondary btn-sm" style="justify-content: flex-start;" id="btn-quick-spooler">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="4 17 10 11 4 5" stroke-width="2"/><line x1="12" y1="19" x2="20" y2="19" stroke-width="2"/></svg>
-                      Reset Spooler di Stampa (PowerShell)
-                    </button>
-                    <button class="btn btn-secondary btn-sm" style="justify-content: flex-start;" id="btn-quick-flushdns">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="4 17 10 11 4 5" stroke-width="2"/><line x1="12" y1="19" x2="20" y2="19" stroke-width="2"/></svg>
-                      Flush DNS & Diagnostica Connettività
-                    </button>
-                    <button class="btn btn-secondary btn-sm" style="justify-content: flex-start;" id="btn-quick-calc">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2" stroke-width="2"/><line x1="8" y1="6" x2="16" y2="6" stroke-width="2"/></svg>
-                      Calcolatore Subnet / Assegnazione IP
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- VISTA 2: TICKET DESK -->
-        <section id="view-tickets" class="view-section">
-          <div class="toolbar-container">
-            <div class="toolbar-left">
-              <input type="text" class="form-input" style="width: 240px;" id="filter-ticket-search" placeholder="Filtra per testo o ID...">
-              
-              <select class="filter-select" id="filter-ticket-status">
-                <option value="all">Tutti gli Stati</option>
-                <option value="Aperto">Aperto</option>
-                <option value="In Lavorazione">In Lavorazione</option>
-                <option value="In Attesa">In Attesa Utente/Ricambi</option>
-                <option value="Risolto">Risolto</option>
-                <option value="Chiuso">Chiuso</option>
-              </select>
-
-              <select class="filter-select" id="filter-ticket-priority">
-                <option value="all">Tutte le Priorità</option>
-                <option value="Critica">Critica (Bloccante)</option>
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Bassa">Bassa</option>
-              </select>
-
-              <select class="filter-select" id="filter-ticket-category">
-                <option value="all">Tutte le Categorie</option>
-                <option value="Hardware & Periferiche">Hardware & Periferiche</option>
-                <option value="Rete & Connettività">Rete & Connettività</option>
-                <option value="Microsoft 365 & Mail">Microsoft 365 & Mail</option>
-                <option value="Account & Active Directory">Account & Active Directory</option>
-                <option value="Software & Client Windows">Software & Client Windows</option>
-              </select>
-            </div>
-
-            <div>
-              <button class="btn btn-primary" id="btn-create-ticket-modal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/>
-                  <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/>
-                </svg>
-                <span>Nuovo Ticket</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-body">
-              <div class="table-responsive">
-                <table class="data-table" id="tickets-table">
-                  <thead>
-                    <tr>
-                      <th>ID Ticket</th>
-                      <th>Data Apertura</th>
-                      <th>Utente & Sede</th>
-                      <th>Categoria</th>
-                      <th>Oggetto della Segnalazione</th>
-                      <th>Asset Collegato</th>
-                      <th>Priorità</th>
-                      <th>Stato</th>
-                      <th style="text-align: right;">Azioni</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tickets-tbody">
-                    <!-- Popolato dinamicamente da app.js -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- VISTA 3: INVENTARIO ASSET (CMDB) -->
-        <section id="view-assets" class="view-section">
-          <div class="toolbar-container">
-            <div class="toolbar-left">
-              <input type="text" class="form-input" style="width: 240px;" id="filter-asset-search" placeholder="Cerca matricola, IP o host...">
-              
-              <select class="filter-select" id="filter-asset-type">
-                <option value="all">Tutte le Tipologie</option>
-                <option value="Desktop PC">Desktop Workstation</option>
-                <option value="Laptop">Laptop / Notebook</option>
-                <option value="Monitor">Monitor & Display</option>
-                <option value="Stampante di Rete">Stampante di Rete</option>
-                <option value="Apparato di Rete">Switch / Access Point</option>
-              </select>
-
-              <select class="filter-select" id="filter-asset-status">
-                <option value="all">Tutti gli Stati</option>
-                <option value="In Uso">In Uso</option>
-                <option value="Scorta Magazzino">Scorta Magazzino</option>
-                <option value="In Riparazione">In Riparazione / Garanzia</option>
-                <option value="Dismesso">Dismesso</option>
-              </select>
-
-              <select class="filter-select" id="filter-asset-warranty">
-                <option value="all">Tutte le Garanzie</option>
-                <option value="active">Garanzia Attiva</option>
-                <option value="expired">Garanzia Scaduta</option>
-              </select>
-            </div>
-
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-secondary" id="btn-export-assets-csv">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"/>
-                  <polyline points="7 10 12 15 17 10" stroke-width="2"/>
-                  <line x1="12" y1="15" x2="12" y2="3" stroke-width="2"/>
-                </svg>
-                <span>Esporta CSV</span>
-              </button>
-              <button class="btn btn-primary" id="btn-create-asset-modal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/>
-                  <line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/>
-                </svg>
-                <span>Registra Asset</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-body">
-              <div class="table-responsive">
-                <table class="data-table" id="assets-table">
-                  <thead>
-                    <tr>
-                      <th>Asset Tag</th>
-                      <th>Hostname</th>
-                      <th>Tipo</th>
-                      <th>Produttore & Modello</th>
-                      <th>Matricola / Service Tag</th>
-                      <th>Utente Assegnato</th>
-                      <th>Ufficio / Sede</th>
-                      <th>Indirizzo IP</th>
-                      <th>Garanzia</th>
-                      <th>Stato</th>
-                      <th style="text-align: right;">Dettagli</th>
-                    </tr>
-                  </thead>
-                  <tbody id="assets-tbody">
-                    <!-- Popolato dinamicamente da app.js -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- VISTA 4: TECHNICIAN TOOLKIT (POWERSHELL & DIAGNOSTICA) -->
-        <section id="view-toolkit" class="view-section">
-          <!-- Calcolatore Subnet Integrato -->
-          <div class="panel" style="margin-bottom: 24px;">
-            <div class="panel-header">
-              <div class="panel-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="4" y="2" width="16" height="20" rx="2" stroke-width="2"/>
-                  <line x1="8" y1="6" x2="16" y2="6" stroke-width="2"/>
-                </svg>
-                <span>Calcolatore Subnet IPv4 (Assegnazione Statica & Pianificazione LAN)</span>
-              </div>
-            </div>
-            <div class="panel-body panel-body-padded">
-              <div class="calc-grid">
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" for="calc-ip">Indirizzo IP Host</label>
-                  <input type="text" id="calc-ip" class="form-input" value="192.168.1.45" placeholder="es. 192.168.1.10">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label" for="calc-cidr">CIDR / Subnet Mask</label>
-                  <select id="calc-cidr" class="form-select">
-                    <option value="24" selected>/24 - 255.255.255.0 (254 host)</option>
-                    <option value="25">/25 - 255.255.255.128 (126 host)</option>
-                    <option value="26">/26 - 255.255.255.192 (62 host)</option>
-                    <option value="27">/27 - 255.255.255.224 (30 host)</option>
-                    <option value="28">/28 - 255.255.255.240 (14 host)</option>
-                    <option value="29">/29 - 255.255.255.248 (6 host - P2P/Router)</option>
-                    <option value="16">/16 - 255.255.0.0 (65.534 host)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="calc-result-grid" id="calc-results">
-                <div class="calc-result-item">
-                  <span>Network ID (Indirizzo Rete)</span>
-                  <span id="res-network">192.168.1.0</span>
-                </div>
-                <div class="calc-result-item">
-                  <span>Subnet Mask</span>
-                  <span id="res-mask">255.255.255.0</span>
-                </div>
-                <div class="calc-result-item">
-                  <span>Indirizzo Broadcast</span>
-                  <span id="res-broadcast">192.168.1.255</span>
-                </div>
-                <div class="calc-result-item">
-                  <span>Range Host Assegnabili</span>
-                  <span id="res-range">192.168.1.1 - 192.168.1.254</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Griglia Script PowerShell Enterprise -->
-          <h2 style="font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text-main);">
-            Script PowerShell & Comandi Diagnostici L1
-          </h2>
-
-          <div class="toolkit-grid" id="toolkit-grid">
-            <!-- Popolato dinamicamente da app.js -->
-          </div>
-        </section>
-      </main>
     </div>
-  </div>
+  </header>
 
-  <!-- MODALE: NUOVO TICKET -->
-  <div class="modal-overlay" id="modal-ticket">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modal-ticket-title">Apertura Nuovo Ticket di Supporto</h3>
-        <button class="modal-close" data-close="modal-ticket">&times;</button>
+  <!-- Barra di Navigazione Principale a Schede -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="tickets" id="tab-btn-tickets">
+          <span class="tab-icon">🎫</span>
+          <span class="tab-label">Ticket di Assistenza</span>
+          <span class="tab-badge" id="badge-open-tickets">2</span>
+        </button>
+        <button class="nav-tab" data-tab="assets" id="tab-btn-assets">
+          <span class="tab-icon">🖥️</span>
+          <span class="tab-label">Inventario PC & Dispositivi</span>
+          <span class="tab-count" id="count-total-assets">(5)</span>
+        </button>
+        <button class="nav-tab" data-tab="tools" id="tab-btn-tools">
+          <span class="tab-icon">🛠️</span>
+          <span class="tab-label">Strumenti Rapidi Help Desk</span>
+        </button>
       </div>
-      <form id="form-ticket">
-        <div class="modal-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label class="form-label" for="ticket-user">Utente Richiedente *</label>
-              <input type="text" id="ticket-user" class="form-input" required placeholder="es. Marco Rossi">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="ticket-dept">Reparto / Ufficio *</label>
-              <input type="text" id="ticket-dept" class="form-input" required placeholder="es. Amministrazione, Vendite, Risorse Umane">
-            </div>
-          </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label class="form-label" for="ticket-cat">Categoria Problema *</label>
-              <select id="ticket-cat" class="form-select" required>
-                <option value="Hardware & Periferiche">Hardware & Periferiche</option>
-                <option value="Rete & Connettività">Rete & Connettività</option>
-                <option value="Microsoft 365 & Mail">Microsoft 365 & Mail</option>
-                <option value="Account & Active Directory">Account & Active Directory</option>
-                <option value="Software & Client Windows">Software & Client Windows</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="ticket-priority">Priorità / Impatto *</label>
-              <select id="ticket-priority" class="form-select" required>
-                <option value="Bassa">Bassa (Nessun blocco operativo)</option>
-                <option value="Media" selected>Media (Operatività parziale)</option>
-                <option value="Alta">Alta (Funzione critica non operativa)</option>
-                <option value="Critica">Critica (Blocco totale postazione / ufficio)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="ticket-asset">Asset Collegato (Hostname / Matricola)</label>
-            <input type="text" id="ticket-asset" class="form-input" placeholder="es. W11-FIN-01 o Dell OptiPlex (opzionale)">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="ticket-subject">Oggetto del Ticket *</label>
-            <input type="text" id="ticket-subject" class="form-input" required placeholder="es. Impossibile stampare su stampante di reparto">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="ticket-desc">Descrizione Dettagliata del Malfunzionamento *</label>
-            <textarea id="ticket-desc" class="form-textarea" rows="4" required placeholder="Descrivi il messaggio di errore riscontrato, comportamento anomalo, eventuali tentativi già svolti..."></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close="modal-ticket">Annulla</button>
-          <button type="submit" class="btn btn-primary">Registra ed Assegna</button>
-        </div>
-      </form>
+      <div class="nav-actions">
+        <button class="btn btn-primary" id="btn-open-new-ticket">
+          <span>+ Nuovo Ticket</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-export-backup" title="Scarica backup JSON">
+          <span>📥 Esporta Dati</span>
+        </button>
+      </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- MODALE: DETTAGLIO & GESTIONE TICKET -->
-  <div class="modal-overlay" id="modal-ticket-detail">
-    <div class="modal-dialog" style="max-width: 680px;">
-      <div class="modal-header">
-        <h3 class="modal-title" id="detail-ticket-title">Dettaglio Ticket #TICK-001</h3>
-        <button class="modal-close" data-close="modal-ticket-detail">&times;</button>
+  <!-- Contenitore Principale -->
+  <main class="main-content">
+
+    <!-- SEZIONE 1: TICKET ASSISTENZA -->
+    <section id="section-tickets" class="app-section active">
+      <!-- KPI Cards / Filtri di Stato Cliccabili -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-all active" onclick="setFilterStatus('all')" id="kpi-filter-all" title="Clicca per mostrare tutti i ticket">
+          <div class="kpi-top">
+            <span class="kpi-icon">📋</span>
+            <span class="kpi-tag">TUTTI</span>
+          </div>
+          <div class="kpi-value" id="kpi-val-all">5</div>
+          <div class="kpi-label">Ticket a Registro</div>
+        </div>
+
+        <div class="kpi-card kpi-open" onclick="setFilterStatus('Aperto')" id="kpi-filter-open" title="Clicca per vedere i ticket aperti">
+          <div class="kpi-top">
+            <span class="kpi-icon">🔴</span>
+            <span class="kpi-tag">DA RISOLVERE</span>
+          </div>
+          <div class="kpi-value" id="kpi-val-open">2</div>
+          <div class="kpi-label">In Attesa di Intervento</div>
+        </div>
+
+        <div class="kpi-card kpi-progress" onclick="setFilterStatus('In Lavorazione')" id="kpi-filter-progress" title="Clicca per vedere i ticket in lavorazione">
+          <div class="kpi-top">
+            <span class="kpi-icon">🟡</span>
+            <span class="kpi-tag">IN CORSO</span>
+          </div>
+          <div class="kpi-value" id="kpi-val-progress">1</div>
+          <div class="kpi-label">Presi in Carico</div>
+        </div>
+
+        <div class="kpi-card kpi-resolved" onclick="setFilterStatus('Risolto')" id="kpi-filter-resolved" title="Clicca per vedere i ticket risolti">
+          <div class="kpi-top">
+            <span class="kpi-icon">🟢</span>
+            <span class="kpi-tag">RISOLTI</span>
+          </div>
+          <div class="kpi-value" id="kpi-val-resolved">2</div>
+          <div class="kpi-label">Interventi Completati</div>
+        </div>
       </div>
+
+      <!-- Barra Ricerca & Filtri -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="ticket-search-input" placeholder="Cerca per nome utente, problema, matricola o codice ticket...">
+          <button class="btn-clear-search hidden" id="btn-clear-search" onclick="clearSearch()">&times;</button>
+        </div>
+
+        <div class="filter-controls">
+          <select id="select-category-filter" class="form-select" onchange="renderTicketTable()">
+            <option value="all">Tutte le Categorie</option>
+            <option value="Hardware & Periferiche">Hardware & Periferiche</option>
+            <option value="Rete LAN & Connettività">Rete LAN & Connettività</option>
+            <option value="Microsoft 365 & Mail">Microsoft 365 & Mail</option>
+            <option value="Software & Client Windows">Software & Client Windows</option>
+            <option value="Account & Permessi">Account & Permessi</option>
+          </select>
+
+          <select id="select-priority-filter" class="form-select" onchange="renderTicketTable()">
+            <option value="all">Tutte le Priorità</option>
+            <option value="Critica">Critica (Bloccante)</option>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Bassa">Bassa</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabella Ticket Cliccabile -->
+      <div class="table-card">
+        <div class="table-header-info">
+          <h2 class="table-title">Elenco Segnalazioni & Richieste Utenti</h2>
+          <span class="results-count" id="tickets-count-label">5 segnalazioni visualizzate</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table" id="tickets-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Codice ID</th>
+                <th style="width: 220px;">Richiedente / Reparto</th>
+                <th>Oggetto Segnalazione & Dispositivo</th>
+                <th style="width: 110px;">Priorità</th>
+                <th style="width: 130px;">Stato Attuale</th>
+                <th style="width: 220px; text-align: center;">Azioni Operatore</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-tbody">
+              <!-- Popolato dinamicamente da app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEZIONE 2: INVENTARIO POSTAZIONI (CMDB) -->
+    <section id="section-assets" class="app-section">
+      <div class="section-intro">
+        <div>
+          <h2 class="section-title">Inventario Postazioni di Lavoro & Dispositivi</h2>
+          <p class="section-subtitle">Censimento hardware aziendale, computer configurati, stampanti e apparati di rete</p>
+        </div>
+        <button class="btn btn-primary" id="btn-open-new-asset">
+          <span>+ Registra Nuovo PC</span>
+        </button>
+      </div>
+
+      <!-- Asset Summary KPI -->
+      <div class="asset-kpi-row">
+        <div class="asset-kpi-pill"><strong>5</strong> Dispositivi Censiti</div>
+        <div class="asset-kpi-pill pill-green"><strong>3</strong> In Uso Attivo</div>
+        <div class="asset-kpi-pill pill-blue"><strong>1</strong> Scorta Magazzino</div>
+        <div class="asset-kpi-pill pill-amber"><strong>1</strong> In Riparazione</div>
+      </div>
+
+      <!-- Griglia Schede Asset -->
+      <div class="assets-grid" id="assets-grid-container">
+        <!-- Popolato dinamicamente -->
+      </div>
+    </section>
+
+    <!-- SEZIONE 3: STRUMENTI RAPIDI HELP DESK -->
+    <section id="section-tools" class="app-section">
+      <div class="section-intro">
+        <div>
+          <h2 class="section-title">Strumenti Rapidi Help Desk & Risoluzione Disservizi</h2>
+          <p class="section-subtitle">Script PowerShell e procedure guidate per i problemi informatici più frequenti</p>
+        </div>
+      </div>
+
+      <div class="tools-grid">
+        <!-- Strumento 1: Reset Spooler Stampante -->
+        <div class="tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🖨️</span>
+            <div>
+              <h3 class="tool-title">Reset Spooler di Stampa Windows</h3>
+              <p class="tool-desc">Sblocca le code di stampa bloccate eliminando i file .SPL corrotti e riavviando il servizio.</p>
+            </div>
+          </div>
+          <div class="tool-code-preview">
+            <code>Stop-Service Spooler -Force; Remove-Item C:\Windows\System32\spool\PRINTERS\* -Force; Start-Service Spooler</code>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-primary btn-sm" onclick="runToolSimulation('spooler')">⚡ Esegui Reset Spooler</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyToolCode('spooler')">📋 Copia Comando</button>
+          </div>
+          <div class="tool-output hidden" id="tool-output-spooler"></div>
+        </div>
+
+        <!-- Strumento 2: Flush DNS & Ripristino Rete -->
+        <div class="tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🌐</span>
+            <div>
+              <h3 class="tool-title">Svuota Cache DNS & Rinnova IP (DHCP)</h3>
+              <p class="tool-desc">Risolve problemi di connettività internet o indirizzi IP invalidi (APIPA 169.254.x.x).</p>
+            </div>
+          </div>
+          <div class="tool-code-preview">
+            <code>ipconfig /flushdns ; ipconfig /release ; ipconfig /renew</code>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-primary btn-sm" onclick="runToolSimulation('dns')">⚡ Esegui Ripristino Rete</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyToolCode('dns')">📋 Copia Comando</button>
+          </div>
+          <div class="tool-output hidden" id="tool-output-dns"></div>
+        </div>
+
+        <!-- Strumento 3: Sblocco Account Utente -->
+        <div class="tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">🔑</span>
+            <div>
+              <h3 class="tool-title">Sblocco Account Active Directory</h3>
+              <p class="tool-desc">Sblocca gli account utente bloccati dopo 3 password errate e reimposta la password temporanea.</p>
+            </div>
+          </div>
+          <div class="tool-code-preview">
+            <code>Unlock-ADAccount -Identity "utente.cognome" ; Set-ADAccountPassword ...</code>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-primary btn-sm" onclick="runToolSimulation('ad')">⚡ Esegui Sblocco Account</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyToolCode('ad')">📋 Copia Comando</button>
+          </div>
+          <div class="tool-output hidden" id="tool-output-ad"></div>
+        </div>
+
+        <!-- Strumento 4: Verifica Connessione Socket TCP -->
+        <div class="tool-card">
+          <div class="tool-header">
+            <span class="tool-icon">📡</span>
+            <div>
+              <h3 class="tool-title">Test Porta di Rete (Socket Test)</h3>
+              <p class="tool-desc">Verifica se una porta remota (es. porta RAW 9100 stampante o porta 445 file server) è aperta e risponde.</p>
+            </div>
+          </div>
+          <div class="tool-code-preview">
+            <code>Test-NetConnection -ComputerName 192.168.1.200 -Port 9100</code>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-primary btn-sm" onclick="runToolSimulation('port')">⚡ Esegui Test Connessione</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyToolCode('port')">📋 Copia Comando</button>
+          </div>
+          <div class="tool-output hidden" id="tool-output-port"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODALE 1: DETTAGLIO & GESTIONE TICKET -->
+  <div class="modal-overlay hidden" id="modal-ticket-detail">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge-id" id="modal-ticket-id">#TICK-101</span>
+          <h2 class="modal-title" id="modal-ticket-title">Oggetto Segnalazione</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('modal-ticket-detail')">&times;</button>
+      </div>
+
       <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-          <div>
-            <span id="detail-ticket-priority-badge" class="badge"></span>
-            <span id="detail-ticket-status-badge" class="badge"></span>
-            <span id="detail-ticket-cat-badge" class="badge" style="background-color: #f1f5f9; color: #475569;"></span>
+        <div class="ticket-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Utente Richiedente:</span>
+            <strong class="meta-val" id="modal-ticket-user">-</strong>
           </div>
-          <div style="font-size: 11px; color: var(--text-muted);" id="detail-ticket-date">Data: 23/11/2026</div>
+          <div class="meta-item">
+            <span class="meta-label">Ufficio / Reparto:</span>
+            <strong class="meta-val" id="modal-ticket-dept">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Dispositivo Coinvolto:</span>
+            <strong class="meta-val" id="modal-ticket-asset">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Priorità Segnalata:</span>
+            <span class="meta-val" id="modal-ticket-priority">-</span>
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; font-size: 13px;">
-          <div><strong>Richiedente:</strong> <span id="detail-ticket-user">-</span></div>
-          <div><strong>Reparto:</strong> <span id="detail-ticket-dept">-</span></div>
-          <div><strong>Dispositivo:</strong> <span id="detail-ticket-asset">-</span></div>
-          <div><strong>Operatore Assegnato:</strong> <span id="detail-ticket-tech">Valentyn Haidukov</span></div>
+        <div class="detail-box">
+          <div class="detail-box-title">Descrizione del Disservizio:</div>
+          <p class="detail-box-text" id="modal-ticket-desc"></p>
         </div>
 
-        <div style="background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px; margin-bottom: 18px;">
-          <strong style="display: block; font-size: 12px; color: #475569; margin-bottom: 4px; text-transform: uppercase;">Descrizione Guasto:</strong>
-          <p id="detail-ticket-desc" style="white-space: pre-line; font-size: 13px; color: #1e293b;"></p>
-        </div>
-
-        <!-- Sezione Aggiornamento Stato e Note Tecniche -->
-        <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Aggiorna Stato e Azione Tecnica</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-          <div>
-            <label class="form-label" for="detail-change-status">Stato Intervento</label>
-            <select id="detail-change-status" class="form-select">
-              <option value="Aperto">Aperto</option>
-              <option value="In Lavorazione">In Lavorazione</option>
-              <option value="In Attesa">In Attesa Utente/Ricambi</option>
-              <option value="Risolto">Risolto</option>
-              <option value="Chiuso">Chiuso</option>
+        <!-- Sezione Azione Rapida Risoluzione -->
+        <div class="status-action-box">
+          <label class="form-label">Aggiorna Stato del Ticket:</label>
+          <div class="status-action-row">
+            <select id="modal-ticket-new-status" class="form-select">
+              <option value="Aperto">🔴 Aperto (Da Risolvere)</option>
+              <option value="In Lavorazione">🟡 In Lavorazione (Preso in Carico)</option>
+              <option value="In Attesa">⚪ In Attesa Utente o Ricambi</option>
+              <option value="Risolto">🟢 Risolto con Successo</option>
+              <option value="Chiuso">⬛ Chiuso & Archiviato</option>
             </select>
-          </div>
-          <div style="display: flex; align-items: flex-end;">
-            <button class="btn btn-primary" id="btn-save-ticket-status" style="width: 100%;">Salva Stato</button>
+            <button class="btn btn-primary" onclick="saveTicketStatus()">Salva Modifiche</button>
+            <button class="btn btn-success" onclick="quickResolveActiveTicket()">✓ Segna come Risolto</button>
           </div>
         </div>
 
-        <div class="form-group" style="margin-top: 10px;">
-          <label class="form-label" for="detail-add-note">Aggiungi Nota Intervento Tecnico</label>
-          <textarea id="detail-add-note" class="form-textarea" rows="2" placeholder="Scrivi la procedura eseguita (es. verificato ping gateway, riavviato servizio spooler, sostituito cavo patch RJ45 cat 6)..."></textarea>
-          <button class="btn btn-secondary btn-sm" id="btn-add-ticket-note" style="margin-top: 6px;">Aggiungi Nota a Registro</button>
-        </div>
+        <!-- Cronologia Note Intervento -->
+        <div class="worklog-section">
+          <h3 class="worklog-title">Storico Interventi Tecnici (Worklog):</h3>
+          <div class="worklog-list" id="modal-ticket-worklog">
+            <!-- Popolato via JS -->
+          </div>
 
-        <!-- Cronologia Note / Interventi -->
-        <h4 style="font-size: 13px; font-weight: 700; margin-top: 18px; margin-bottom: 8px;">Storico Interventi (Worklog)</h4>
-        <div class="ticket-timeline" id="detail-ticket-timeline">
-          <!-- Popolato dinamicamente -->
+          <div class="add-note-box">
+            <input type="text" id="input-new-note" class="form-input" placeholder="Aggiungi una nota tecnica (es. sostituito cavo di rete, riavviato spooler)...">
+            <button class="btn btn-secondary btn-sm" onclick="addNoteToActiveTicket()">+ Aggiungi Nota</button>
+          </div>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close="modal-ticket-detail">Chiudi</button>
+        <button class="btn btn-secondary" onclick="closeModal('modal-ticket-detail')">Chiudi</button>
       </div>
     </div>
   </div>
 
-  <!-- MODALE: REGISTRA ASSET -->
-  <div class="modal-overlay" id="modal-asset">
-    <div class="modal-dialog">
+  <!-- MODALE 2: NUOVO TICKET -->
+  <div class="modal-overlay hidden" id="modal-new-ticket">
+    <div class="modal-box">
       <div class="modal-header">
-        <h3 class="modal-title">Censimento Nuovo Dispositivo Hardware (CMDB)</h3>
-        <button class="modal-close" data-close="modal-asset">&times;</button>
+        <h2 class="modal-title">Apri Nuova Richiesta di Assistenza</h2>
+        <button class="modal-close-btn" onclick="closeModal('modal-new-ticket')">&times;</button>
       </div>
-      <form id="form-asset">
+      <form id="form-create-ticket" onsubmit="handleCreateTicket(event)">
         <div class="modal-body">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="asset-hostname">Hostname di Rete *</label>
-              <input type="text" id="asset-hostname" class="form-input" required placeholder="es. W11-MKT-03">
+              <label class="form-label" for="new-ticket-user">Nome & Cognome Utente *</label>
+              <input type="text" id="new-ticket-user" class="form-input" required placeholder="Es. Marco Rossi">
             </div>
             <div class="form-group">
-              <label class="form-label" for="asset-type">Tipologia Dispositivo *</label>
-              <select id="asset-type" class="form-select" required>
-                <option value="Desktop PC">Desktop Workstation</option>
-                <option value="Laptop">Laptop / Notebook</option>
-                <option value="Monitor">Monitor & Display</option>
-                <option value="Stampante di Rete">Stampante di Rete</option>
-                <option value="Apparato di Rete">Switch / Access Point</option>
+              <label class="form-label" for="new-ticket-dept">Reparto / Ufficio *</label>
+              <input type="text" id="new-ticket-dept" class="form-input" required placeholder="Es. Amministrazione, Ufficio Vendite">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="new-ticket-category">Categoria Disservizio *</label>
+              <select id="new-ticket-category" class="form-select" required>
+                <option value="Hardware & Periferiche">Hardware & Periferiche (PC, Stampante, Monitor)</option>
+                <option value="Rete LAN & Connettività">Rete LAN & Connettività (Wi-Fi, Cavo, Switch)</option>
+                <option value="Microsoft 365 & Mail">Microsoft 365 & Mail (Outlook, Teams, OneDrive)</option>
+                <option value="Software & Client Windows">Software & Client Windows (Crash, BSOD, Update)</option>
+                <option value="Account & Permessi">Account & Permessi (Active Directory, Password)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="new-ticket-priority">Livello di Priorità *</label>
+              <select id="new-ticket-priority" class="form-select" required>
+                <option value="Bassa">Bassa (Richiesta ordinaria)</option>
+                <option value="Media" selected>Media (Rallentamento)</option>
+                <option value="Alta">Alta (Postazione o utente bloccato)</option>
+                <option value="Critica">Critica (Disservizio generale/reparto)</option>
               </select>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="new-ticket-subject">Oggetto del Problema *</label>
+            <input type="text" id="new-ticket-subject" class="form-input" required placeholder="Es. Stampante di rete non stampa documenti contabili">
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="asset-model">Produttore & Modello *</label>
-              <input type="text" id="asset-model" class="form-input" required placeholder="es. Dell OptiPlex 7090 / HP EliteBook 840">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="asset-serial">Matricola / Service Tag (S/N) *</label>
-              <input type="text" id="asset-serial" class="form-input" required placeholder="es. 7XG81P3">
+              <label class="form-label" for="new-ticket-asset">Dispositivo Coinvolto (Opzionale)</label>
+              <input type="text" id="new-ticket-asset" class="form-input" placeholder="Es. W11-COMM-04 oppure Stampante Kyocera">
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label class="form-label" for="asset-user">Utente Assegnato</label>
-              <input type="text" id="asset-user" class="form-input" placeholder="es. Chiara Bianchi (o 'Magazzino Scorta')">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="asset-location">Sede / Ufficio *</label>
-              <input type="text" id="asset-location" class="form-input" required placeholder="es. Sede Centrale - Piano 2">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label class="form-label" for="asset-ip">Indirizzo IP LAN</label>
-              <input type="text" id="asset-ip" class="form-input" placeholder="es. 192.168.1.112 (DHCP/Statico)">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="asset-status">Stato Operativo *</label>
-              <select id="asset-status" class="form-select" required>
-                <option value="In Uso" selected>In Uso</option>
-                <option value="Scorta Magazzino">Scorta Magazzino</option>
-                <option value="In Riparazione">In Riparazione</option>
-                <option value="Dismesso">Dismesso</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label class="form-label" for="asset-warranty-date">Scadenza Garanzia Hardware *</label>
-              <input type="date" id="asset-warranty-date" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="asset-specs">Specifiche Sintetiche (CPU / RAM / SSD)</label>
-              <input type="text" id="asset-specs" class="form-input" placeholder="es. i5-11500 / 16GB RAM / 512GB NVMe / Win 11 Pro">
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="new-ticket-desc">Descrizione Dettagliata *</label>
+            <textarea id="new-ticket-desc" class="form-textarea" rows="3" required placeholder="Descrivi il comportamento anomalo, messaggi di errore visualizzati dall'utente..."></textarea>
           </div>
         </div>
+
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close="modal-asset">Annulla</button>
-          <button type="submit" class="btn btn-primary">Salva Asset a Inventario</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-new-ticket')">Annulla</button>
+          <button type="submit" class="btn btn-primary">Registra e Assegna Ticket</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODALE: SCHEDA TECNICA ASSET -->
-  <div class="modal-overlay" id="modal-asset-detail">
-    <div class="modal-dialog" style="max-width: 600px;">
+  <!-- MODALE 3: SCHEDA TECNICA ASSET -->
+  <div class="modal-overlay hidden" id="modal-asset-detail">
+    <div class="modal-box">
       <div class="modal-header">
-        <h3 class="modal-title" id="detail-asset-title">Scheda Tecnica Asset #AST-001</h3>
-        <button class="modal-close" data-close="modal-asset-detail">&times;</button>
+        <div>
+          <span class="modal-badge-id" id="modal-asset-id">AST-001</span>
+          <h2 class="modal-title" id="modal-asset-title">Scheda Tecnica Postazione</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('modal-asset-detail')">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-          <span id="detail-asset-status-badge" class="badge"></span>
-          <span id="detail-asset-warranty-badge" class="badge"></span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 16px;">
-          <div><strong>Hostname:</strong> <span id="detail-asset-host">-</span></div>
-          <div><strong>Tipo Dispositivo:</strong> <span id="detail-asset-type">-</span></div>
-          <div><strong>Produttore & Modello:</strong> <span id="detail-asset-model">-</span></div>
-          <div><strong>Matricola (S/N):</strong> <span id="detail-asset-serial" style="font-family: var(--font-mono); font-weight: 600;">-</span></div>
-          <div><strong>Utente Assegnatario:</strong> <span id="detail-asset-user">-</span></div>
-          <div><strong>Ufficio / Postazione:</strong> <span id="detail-asset-loc">-</span></div>
-          <div><strong>Indirizzo IP:</strong> <span id="detail-asset-ip" style="font-family: var(--font-mono);">-</span></div>
-          <div><strong>Scadenza Garanzia:</strong> <span id="detail-asset-warranty">-</span></div>
-        </div>
-
-        <div style="background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px; margin-bottom: 12px;">
-          <strong style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 6px;">Configurazione Hardware & Sistema Operativo</strong>
-          <div id="detail-asset-specs" style="font-size: 13px; color: #1e293b;">-</div>
-          <div style="margin-top: 8px; font-size: 12px; color: #166534; display: flex; align-items: center; gap: 6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="2"/>
-            </svg>
-            <span>BitLocker: Crittografia Attiva (Protezione TPM 2.0 verificata)</span>
+        <div class="asset-detail-card">
+          <div class="asset-detail-icon" id="modal-asset-icon">💻</div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem; color: #0f172a;" id="modal-asset-model">Modello</h3>
+            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 0.9rem;" id="modal-asset-type">Tipologia</p>
           </div>
+        </div>
+
+        <div class="ticket-meta-grid" style="margin-top: 1rem;">
+          <div class="meta-item">
+            <span class="meta-label">Hostname di Rete:</span>
+            <strong class="meta-val" id="modal-asset-hostname">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Indirizzo IP:</span>
+            <strong class="meta-val" id="modal-asset-ip">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Numero di Serie / Service Tag:</span>
+            <strong class="meta-val" id="modal-asset-serial">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Utente Assegnatario:</span>
+            <strong class="meta-val" id="modal-asset-user">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Ufficio / Posizione:</span>
+            <strong class="meta-val" id="modal-asset-loc">-</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Stato Attuale:</span>
+            <span class="meta-val" id="modal-asset-status">-</span>
+          </div>
+        </div>
+
+        <div class="detail-box" style="margin-top: 1rem;">
+          <div class="detail-box-title">Specifiche Hardware & Sistema Operativo:</div>
+          <p class="detail-box-text" id="modal-asset-specs">-</p>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close="modal-asset-detail">Chiudi Scheda</button>
+        <button class="btn btn-secondary" onclick="closeModal('modal-asset-detail')">Chiudi</button>
       </div>
     </div>
   </div>
 
-  <!-- Contenitore Toast Notifiche -->
+  <!-- Toast Notifiche -->
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- Script Logico Applicativo -->
   <script src="app.js"></script>
 </body>
 </html>
