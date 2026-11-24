@@ -139,7 +139,8 @@
           <span class="results-count" id="tickets-count-label">5 segnalazioni visualizzate</span>
         </div>
 
-        <div class="table-responsive">
+        <!-- Tabella Ticket: Versione Desktop (> 640px) -->
+        <div class="desktop-tickets-table table-responsive">
           <table class="custom-table" id="tickets-table">
             <thead>
               <tr>
@@ -155,6 +156,11 @@
               <!-- Popolato dinamicamente da app.js -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Schede Ticket Responsive: Versione Mobile (<= 640px, 100% visibili senza tagli) -->
+        <div class="mobile-tickets-cards" id="tickets-mobile-cards">
+          <!-- Popolato dinamicamente da app.js -->
         </div>
       </div>
     </section>

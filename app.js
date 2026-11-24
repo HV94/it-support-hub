@@ -319,6 +319,8 @@ function renderTicketTable() {
   const countLabel = document.getElementById("tickets-count-label");
   if (countLabel) countLabel.textContent = `${filtrati.length} segnalazioni trovate`;
 
+  const mobileContainer = document.getElementById("tickets-mobile-cards");
+
   if (filtrati.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -329,6 +331,15 @@ function renderTicketTable() {
         </td>
       </tr>
     `;
+    if (mobileContainer) {
+      mobileContainer.innerHTML = `
+        <div style="text-align: center; padding: 2rem; color: #64748b; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+          <strong>Nessun ticket corrisponde ai filtri selezionati.</strong>
+          <div style="font-size: 0.85rem; margin-top: 0.35rem;">Prova a modificare i termini di ricerca o rimuovere i filtri.</div>
+        </div>
+      `;
+    }
     return;
   }
 
@@ -392,6 +403,71 @@ function renderTicketTable() {
       </tr>
     `;
   }).join("");
+
+  // Rendering Schede Mobile (100% visibili, zero tagli orizzontali)
+  if (mobileContainer) {
+    mobileContainer.innerHTML = filtrati.map(t => {
+      const isResolved = t.status === "Risolto" || t.status === "Chiuso";
+      const isOpening = t.status === "Aperto";
+
+      let prioClass = "badge-prio-media";
+      if (t.priority === "Critica") prioClass = "badge-prio-critica";
+      else if (t.priority === "Alta") prioClass = "badge-prio-alta";
+      else if (t.priority === "Bassa") prioClass = "badge-prio-bassa";
+
+      let statusClass = "badge-status-aperto";
+      if (t.status === "In Lavorazione") statusClass = "badge-status-lavorazione";
+      else if (t.status === "In Attesa") statusClass = "badge-status-attesa";
+      else if (t.status === "Risolto") statusClass = "badge-status-risolto";
+      else if (t.status === "Chiuso") statusClass = "badge-status-chiuso";
+
+      return `
+        <div class="ticket-mobile-card" onclick="openTicketDetailModal('${t.id}')">
+          <div class="ticket-mobile-header">
+            <div class="ticket-mobile-id-box">
+              <span class="ticket-id-badge">#${t.id}</span>
+              <span class="ticket-mobile-date">📅 ${t.date.split(" ")[0]}</span>
+            </div>
+            <div class="ticket-mobile-badges">
+              <span class="badge ${prioClass}">${t.priority}</span>
+              <span class="badge ${statusClass}">${t.status === 'Risolto' ? '✓ ' : ''}${t.status}</span>
+            </div>
+          </div>
+
+          <div class="ticket-mobile-subject">${t.subject}</div>
+
+          <div class="ticket-mobile-details">
+            <div class="ticket-mobile-detail-row">
+              <span class="detail-label">Richiedente:</span>
+              <strong style="color: #0f172a;">${t.user}</strong>
+              <span style="color: #64748b; font-size: 0.78rem;">(${t.department})</span>
+            </div>
+            <div class="ticket-mobile-detail-row">
+              <span class="detail-label">Asset IT:</span>
+              <span style="color: #2563eb; font-weight: 600;">${t.category}</span>
+              <span style="color: #475569;">&bull; ${t.asset}</span>
+            </div>
+          </div>
+
+          <div class="ticket-mobile-actions">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openTicketDetailModal('${t.id}')" title="Apri scheda dettagli">
+              🔍 Dettagli
+            </button>
+            ${isOpening ? `
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); quickTakeTicket('${t.id}')" title="Prendi in carico">
+                ⚙️ Prendi
+              </button>
+            ` : ''}
+            ${!isResolved ? `
+              <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); quickResolveTicket('${t.id}')" title="Segna come risolto">
+                ✓ Risolvi
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
 }
 
 // RENDERING GRIGLIA ASSET (CMDB)
