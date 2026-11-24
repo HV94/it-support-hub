@@ -472,10 +472,10 @@ function switchView(viewName) {
   const titleEl = document.getElementById("page-title");
   if (titleEl) {
     switch (viewName) {
-      case "dashboard": titleEl.textContent = "Panoramica Service Desk & Alert"; break;
-      case "tickets": titleEl.textContent = "Ticket Desk - Gestione Richieste IT"; break;
-      case "assets": titleEl.textContent = "Inventario Hardware CMDB"; break;
-      case "toolkit": titleEl.textContent = "Technician Toolkit & Script PowerShell"; break;
+      case "dashboard": titleEl.textContent = "Pannello Assistenza & Ticket"; break;
+      case "tickets": titleEl.textContent = "Registro Richieste di Assistenza"; break;
+      case "assets": titleEl.textContent = "Registro Postazioni & Hardware"; break;
+      case "toolkit": titleEl.textContent = "Comandi Diagnostici PowerShell"; break;
     }
   }
 

@@ -395,50 +395,34 @@ html, body {
 .kpi-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.kpi-card:hover {
-  box-shadow: var(--shadow-md);
-}
+.kpi-card-blue { border-left: 4px solid #1e40af; }
+.kpi-card-red { border-left: 4px solid #b91c1c; }
+.kpi-card-green { border-left: 4px solid #15803d; }
+.kpi-card-amber { border-left: 4px solid #b45309; }
 
 .kpi-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .kpi-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.3px;
+  color: #475569;
+  letter-spacing: 0.4px;
 }
-
-.kpi-icon-wrapper {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.kpi-icon-blue { background-color: var(--primary-light); color: var(--primary); }
-.kpi-icon-amber { background-color: var(--warning-bg); color: var(--warning); }
-.kpi-icon-emerald { background-color: var(--success-bg); color: var(--success); }
-.kpi-icon-red { background-color: var(--danger-bg); color: var(--danger); }
-.kpi-icon-slate { background-color: #f1f5f9; color: #475569; }
 
 .kpi-value {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.1;
@@ -447,7 +431,7 @@ html, body {
 .kpi-subtext {
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* Sezioni a Schede & Griglie Dashboard */

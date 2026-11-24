@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Support Hub - Service Desk & Asset CMDB</title>
+  <title>Pannello Supporto IT - Assistenza L1 & Inventario Hardware</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,22 +17,22 @@
             <line x1="8" y1="21" x2="16" y2="21" stroke-width="2"/>
             <line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/>
           </svg>
-          <span>IT Support Hub</span>
+          <span>Pannello Supporto IT</span>
         </div>
-        <div class="brand-subtitle">Console Help Desk L1 & Asset CMDB</div>
+        <div class="brand-subtitle">Servizio Sistemi Informativi</div>
       </div>
 
       <div class="operator-badge">
-        <div class="operator-role">Tecnico di Supporto L1</div>
+        <div class="operator-role">Presidio Help Desk L1</div>
         <div class="operator-name">Valentyn Haidukov</div>
         <div class="operator-status">
           <span class="status-dot"></span>
-          <span>In Servizio • Turno Desk</span>
+          <span>Operatore in Servizio</span>
         </div>
       </div>
 
       <nav class="sidebar-nav">
-        <div class="nav-section-title">Operazioni Desk</div>
+        <div class="nav-section-title">Supporto Client</div>
         <a class="nav-item active" data-view="dashboard">
           <div class="nav-item-content">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -41,7 +41,7 @@
               <rect x="14" y="12" width="7" height="9" stroke-width="2"/>
               <rect x="3" y="16" width="7" height="5" stroke-width="2"/>
             </svg>
-            <span>Panoramica</span>
+            <span>Riepilogo</span>
           </div>
         </a>
 
@@ -51,7 +51,7 @@
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="2"/>
               <polyline points="22,6 12,13 2,6" stroke-width="2"/>
             </svg>
-            <span>Ticket Desk</span>
+            <span>Registro Ticket</span>
           </div>
           <span class="nav-badge" id="sidebar-open-tickets-count">0</span>
         </a>
@@ -64,22 +64,22 @@
               <line x1="6" y1="6" x2="6.01" y2="6" stroke-width="2"/>
               <line x1="6" y1="18" x2="6.01" y2="18" stroke-width="2"/>
             </svg>
-            <span>Inventario Asset</span>
+            <span>Inventario Macchine</span>
           </div>
         </a>
 
-        <div class="nav-section-title">Strumenti & Diagnostica</div>
+        <div class="nav-section-title">Strumenti Tecnico</div>
         <a class="nav-item" data-view="toolkit">
           <div class="nav-item-content">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <polyline points="4 17 10 11 4 5" stroke-width="2"/>
               <line x1="12" y1="19" x2="20" y2="19" stroke-width="2"/>
             </svg>
-            <span>Technician Toolkit</span>
+            <span>Comandi PowerShell</span>
           </div>
         </a>
 
-        <div class="nav-section-title">Amministrazione Dati</div>
+        <div class="nav-section-title">Dati & Backup</div>
         <a class="nav-item" id="btn-export-data">
           <div class="nav-item-content">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -98,7 +98,7 @@
               <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke-width="2"/>
               <path d="M3 21v-5h5" stroke-width="2"/>
             </svg>
-            <span>Ripristina Dati Demo</span>
+            <span>Ripristina Dati Iniziali</span>
           </div>
         </a>
       </nav>
@@ -109,7 +109,7 @@
           <span>CORP.LOCAL</span>
         </div>
         <div class="system-status-indicator">
-          <span>Microsoft 365 Tenant</span>
+          <span>Tenant Microsoft 365</span>
           <span>Sincronizzato</span>
         </div>
       </div>
@@ -120,7 +120,7 @@
       <!-- Top Header -->
       <header class="top-header">
         <div class="header-left">
-          <h1 class="page-title" id="page-title">Panoramica Service Desk</h1>
+          <h1 class="page-title" id="page-title">Pannello Assistenza & Ticket</h1>
           <div class="header-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="11" cy="11" r="8" stroke-width="2"/>
@@ -154,64 +154,36 @@
         <section id="view-dashboard" class="view-section active">
           <!-- KPI Cards -->
           <div class="kpi-grid">
-            <div class="kpi-card">
+            <div class="kpi-card kpi-card-blue">
               <div class="kpi-header">
-                <span class="kpi-label">Ticket Aperti</span>
-                <div class="kpi-icon-wrapper kpi-icon-blue">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
-                    <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"/>
-                  </svg>
-                </div>
+                <span class="kpi-label">Ticket da Risolvere</span>
               </div>
               <div class="kpi-value" id="kpi-open-tickets">0</div>
-              <div class="kpi-subtext" id="kpi-open-subtext">Richieste in attesa di risoluzione</div>
+              <div class="kpi-subtext" id="kpi-open-subtext">Richieste in attesa di intervento</div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card kpi-card-red">
               <div class="kpi-header">
-                <span class="kpi-label">Priorità Critica / Alta</span>
-                <div class="kpi-icon-wrapper kpi-icon-red">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-width="2"/>
-                    <line x1="12" y1="9" x2="12" y2="13" stroke-width="2"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2"/>
-                  </svg>
-                </div>
+                <span class="kpi-label">Priorità Alta / Critica</span>
               </div>
               <div class="kpi-value" id="kpi-critical-tickets">0</div>
-              <div class="kpi-subtext">SLA da monitorare con urgenza</div>
+              <div class="kpi-subtext">Postazioni bloccate o disservizi di rete</div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card kpi-card-green">
               <div class="kpi-header">
-                <span class="kpi-label">Asset Hardware Censiti</span>
-                <div class="kpi-icon-wrapper kpi-icon-emerald">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="2" y="3" width="20" height="14" rx="2" stroke-width="2"/>
-                    <line x1="8" y1="21" x2="16" y2="21" stroke-width="2"/>
-                    <line x1="12" y1="17" x2="12" y2="21" stroke-width="2"/>
-                  </svg>
-                </div>
+                <span class="kpi-label">Postazioni Censite</span>
               </div>
               <div class="kpi-value" id="kpi-total-assets">0</div>
               <div class="kpi-subtext" id="kpi-active-assets-sub">0 postazioni attive in azienda</div>
             </div>
 
-            <div class="kpi-card">
+            <div class="kpi-card kpi-card-amber">
               <div class="kpi-header">
-                <span class="kpi-label">Disponibili a Magazzino</span>
-                <div class="kpi-icon-wrapper kpi-icon-amber">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke-width="2"/>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke-width="2"/>
-                    <line x1="12" y1="22.08" x2="12" y2="12" stroke-width="2"/>
-                  </svg>
-                </div>
+                <span class="kpi-label">Macchine a Magazzino</span>
               </div>
               <div class="kpi-value" id="kpi-stock-assets">0</div>
-              <div class="kpi-subtext">Pronti per nuovo onboarding</div>
+              <div class="kpi-subtext">Pronte per nuova configurazione utente</div>
             </div>
           </div>
 
