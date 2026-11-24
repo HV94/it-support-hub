@@ -1,13 +1,22 @@
 /**
- * IT Support Hub - Enterprise Service Desk & Asset CMDB
- * Autore: Valentyn Haidukov (IT Support Specialist L1)
- * Logica client-side con persistenza localStorage, filtri e toolkit PowerShell
+ * ==============================================================================
+ * IT SUPPORT HUB - PANNELLO ASSISTENZA & SERVICE DESK L1
+ * Sviluppato da Valentyn Haidukov (IT Support Specialist - L. 68/99)
+ * ==============================================================================
+ * Codice sorgente JavaScript Vanilla pulito, trasparente e ben commentato.
+ * Funzionalità principali:
+ * - Coda ticket di supporto con filtro per stato, priorità e categoria
+ * - Dettaglio ticket con cronologia interventi (Worklog) e aggiornamento stato
+ * - Inventario hardware aziendale (CMDB postazioni e apparati di rete)
+ * - Calcolatore Subnet IPv4 (Network ID, Maschera, Broadcast, Host utilizzabili)
+ * - Toolkit PowerShell con script di ripristino spooler, DNS e diagnostica client
+ * - Persistenza locale dei dati in localStorage ed esportazione backup JSON
+ * ==============================================================================
  */
 
-// =============================================================================
-// DATI DI DEFAULT (DEMO DATA REALISTICI AMBIENTE ENTERPRISE WINDOWS)
-// =============================================================================
-
+// ------------------------------------------------------------------------------
+// 1. DATASET INIZIALE TICKET & INVENTARIO ASSET (Simulazione ambiente Help Desk)
+// ------------------------------------------------------------------------------
 const DEFAULT_TICKETS = [
   {
     id: "TICK-101",
@@ -19,18 +28,10 @@ const DEFAULT_TICKETS = [
     priority: "Alta",
     status: "In Lavorazione",
     date: "2026-11-23 09:15",
-    description: "Da stamattina tutti i documenti inviati in stampa rimangono bloccati in coda 'Errore - In stampa'. Riavviata la stampante dal display frontale ma i client Windows 11 continuano a fallire la connessione socket sulla porta 9100.",
+    description: "I documenti inviati in stampa rimangono bloccati in coda su 3 postazioni Windows 11. Connessione socket socket porta 9100 fallita.",
     worklog: [
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-23 09:25",
-        text: "Eseguito ping verso 192.168.1.200 con esito positivo (<1ms). Test-NetConnection su porta 9100 fallito (porta chiusa o blocco driver). Coda di stampa locale corrotta su 3 postazioni contabili."
-      },
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-23 09:40",
-        text: "Eseguito script PowerShell per arresto servizio Spooler, pulizia dei file .SPL/.SHD nella cartella spool\\PRINTERS e riavvio servizio. In attesa di verifica stampa prova con l'utente."
-      }
+      { tech: "Valentyn Haidukov", date: "2026-11-23 09:25", text: "Ping positivo (<1ms). Coda di stampa locale corrotta." },
+      { tech: "Valentyn Haidukov", date: "2026-11-23 09:40", text: "Eseguito script PowerShell per arresto servizio Spooler, pulizia cartella spool\\PRINTERS e riavvio." }
     ]
   },
   {
@@ -43,13 +44,9 @@ const DEFAULT_TICKETS = [
     priority: "Media",
     status: "Aperto",
     date: "2026-11-23 10:02",
-    description: "All'avvio del client desktop di Outlook compare popup continuo di richiesta password per l'account aziendale M365. L'accesso via portale web (portal.office.com) funziona regolarmente.",
+    description: "All'avvio di Outlook compare popup continuo di richiesta password per l'account aziendale M365.",
     worklog: [
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-23 10:15",
-        text: "Ticket assegnato. Problema tipico di Modern Authentication o token di sessione corrotto nel Windows Credential Manager. Pianificato intervento in Desktop Remoto."
-      }
+      { tech: "Valentyn Haidukov", date: "2026-11-23 10:15", text: "Pianificata rimozione token di sessione corrotto nel Windows Credential Manager." }
     ]
   },
   {
@@ -62,56 +59,39 @@ const DEFAULT_TICKETS = [
     priority: "Critica",
     status: "In Attesa",
     date: "2026-11-22 16:40",
-    description: "Durante l'elaborazione dei prospetti presenze mensili la workstation si è riavviata improvvisamente con schermata blu. Riavviando, il sistema ha impiegato 10 minuti per ripristinare il file system.",
+    description: "Durante l'elaborazione dei prospetti la workstation si è riavviata con schermata blu.",
     worklog: [
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-22 17:05",
-        text: "Analizzato il file minidump in C:\\Windows\\Minidump. Il codice di bugcheck punta al driver di rete Realtek PCIe GbE (rt640x64.sys). Eseguito DISM /RestoreHealth e SFC /scannow (rilevati e riparati file corrotti)."
-      },
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-22 17:30",
-        text: "Scaricato pacchetto driver certificato Dell Command | Update. In attesa di finestra di manutenzione concordata con l'utente per riavvio finale."
-      }
+      { tech: "Valentyn Haidukov", date: "2026-11-22 17:05", text: "Minidump punta al driver di rete Realtek. Eseguito DISM /RestoreHealth e SFC /scannow." }
     ]
   },
   {
     id: "TICK-104",
-    user: "Simone Ferri",
-    department: "Marketing & Comunicazione",
-    category: "Rete & Connettività",
-    subject: "Postazione grafica disconnessa da share di rete (Unità Z: Fileserver)",
-    asset: "W11-MKT-01 (Dell Precision 3650)",
-    priority: "Media",
+    user: "Marco Santoro",
+    department: "Magazzino & Logistica",
+    category: "Account & Permessi",
+    subject: "Account Active Directory bloccato dopo 3 tentativi errati di password",
+    asset: "W11-LOG-01 (Lenovo ThinkCentre M70q)",
+    priority: "Bassa",
     status: "Risolto",
-    date: "2026-11-21 11:20",
-    description: "L'unità di rete mappata Z: su fileserver.corp.local non è raggiungibile. Errore Windows: 'Impossibile trovare il percorso di rete (0x80070035)'.",
+    date: "2026-11-22 14:10",
+    description: "Utente rientrato dalle ferie non ricorda la nuova password impostata prima della scadenza.",
     worklog: [
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-21 11:40",
-        text: "Verificato stato scheda di rete: il client aveva un indirizzo APIPA (169.254.x.x) a causa di un cavo patch RJ45 difettoso sulla presa a muro. Sostituito cavo con patch Cat 6, eseguito ipconfig /renew. Leasing DHCP ripristinato e share Z: accessibile."
-      }
+      { tech: "Valentyn Haidukov", date: "2026-11-22 14:15", text: "Verificato stato account in AD. Eseguito sblocco utente e reset password temporanea con flag cambio obbligatorio al primo accesso." }
     ]
   },
   {
     id: "TICK-105",
-    user: "Giulia Marini",
+    user: "Simona Valenti",
     department: "Direzione Generale",
-    category: "Account & Active Directory",
-    subject: "Onboarding nuovo consulente: creazione utente e permessi cartelle riservate",
-    asset: "W11-DIR-02 (Lenovo ThinkPad X1)",
+    category: "Rete LAN & Connettività",
+    subject: "Laptop aziendale non ottiene indirizzo IP valido in Wi-Fi (IP APIPA 169.254.x.x)",
+    asset: "W11-DIR-01 (Dell XPS 13)",
     priority: "Alta",
     status: "Chiuso",
-    date: "2026-11-20 14:00",
-    description: "Richiesta abilitazione utente temporaneo per consulente esterno con accesso a M365 Business Standard e cartella Documenti_DG.",
+    date: "2026-11-21 11:30",
+    description: "Il portatile si collega all'SSID aziendale ma non naviga e non raggiunge i file server.",
     worklog: [
-      {
-        tech: "Valentyn Haidukov",
-        date: "2026-11-20 15:15",
-        text: "Creato account su Active Directory Domain Services (OU Consulenti_Esterni) con scadenza a 90 giorni. Sincronizzato su Entra ID tramite Azure AD Connect. Abilitata policy MFA e verificate ACL di cartella."
-      }
+      { tech: "Valentyn Haidukov", date: "2026-11-21 11:45", text: "Eseguito ipconfig /release e ipconfig /renew. Connessione ripristinata con IP 192.168.1.115." }
     ]
   }
 ];
@@ -119,499 +99,461 @@ const DEFAULT_TICKETS = [
 const DEFAULT_ASSETS = [
   {
     id: "AST-001",
-    hostname: "W11-FIN-01",
+    hostname: "W11-HR-02",
     type: "Desktop PC",
-    model: "Dell OptiPlex 7090",
+    model: "Dell OptiPlex 7090 Micro",
     serial: "7XG81P3",
-    user: "Marco Rossi",
-    location: "Amministrazione - Sede",
-    ip: "192.168.1.110",
+    user: "Chiara Fontana",
+    department: "Risorse Umane",
+    location: "Sede Centrale - Piano 1",
+    ip: "192.168.1.102",
     status: "In Uso",
-    warrantyDate: "2027-10-15",
-    specs: "Intel Core i7-11700 / 16GB RAM DDR4 / 512GB NVMe / Windows 11 Pro Enterprise"
+    warranty: "2027-09-15",
+    specs: "Intel Core i5-11500, 16GB DDR4, SSD 512GB NVMe, Windows 11 Pro 64-bit"
   },
   {
     id: "AST-002",
     hostname: "W11-COMM-04",
-    type: "Laptop",
-    model: "HP EliteBook 840 G8",
-    serial: "5CG1248K9Z",
+    type: "Notebook",
+    model: "HP EliteBook 840 G9",
+    serial: "5CD23910KL",
     user: "Roberto De Angelis",
-    location: "Vendite / Smart Working",
-    ip: "192.168.1.115",
+    department: "Commerciale",
+    location: "Postazione Remota / Ufficio Est",
+    ip: "192.168.1.108",
     status: "In Uso",
-    warrantyDate: "2026-08-30",
-    specs: "Intel Core i5-1145G7 vPro / 16GB RAM / 512GB NVMe / Windows 11 Enterprise"
+    warranty: "2027-03-30",
+    specs: "Intel Core i7-1260P, 32GB DDR5, SSD 1TB NVMe, Wi-Fi 6E, Win 11 Pro"
   },
   {
     id: "AST-003",
-    hostname: "W11-HR-02",
-    type: "Desktop PC",
-    model: "Dell OptiPlex 7090",
-    serial: "3HG99Q2",
-    user: "Chiara Fontana",
-    location: "Ufficio HR - Piano 1",
-    ip: "192.168.1.118",
-    status: "In Riparazione",
-    warrantyDate: "2027-11-20",
-    specs: "Intel Core i5-11500 / 16GB RAM / 256GB NVMe / Windows 11 Pro"
+    hostname: "W11-STK-01",
+    type: "Notebook",
+    model: "Lenovo ThinkPad T14 Gen 3",
+    serial: "PF3Z98AA",
+    user: "Magazzino IT (Scorta)",
+    department: "IT & Sistemi",
+    location: "Armadio Rack - Laboratorio",
+    ip: "DHCP",
+    status: "Scorta Magazzino",
+    warranty: "2026-12-31",
+    specs: "AMD Ryzen 5 Pro 6650U, 16GB LPDDR5, SSD 512GB, Pronto per deploy"
   },
   {
     id: "AST-004",
     hostname: "PRN-KYO-ADM01",
     type: "Stampante di Rete",
     model: "Kyocera TASKalfa 3253ci",
-    serial: "KY-9928103",
-    user: "Reparto Contabilità",
+    serial: "Q8A1904512",
+    user: "Condivisa Ufficio Contabilità",
+    department: "Amministrazione",
     location: "Corridoio Amministrazione",
     ip: "192.168.1.200",
-    status: "In Uso",
-    warrantyDate: "2028-03-10",
-    specs: "Multifunzione Laser Colori A3/A4 / Scheda Gigabit Ethernet / Modulo Duplex & OCR"
+    status: "In Riparazione",
+    warranty: "2028-01-20",
+    specs: "Multifunzione laser A3/A4 colore, Porta RAW 9100, IP Statico"
   },
   {
     id: "AST-005",
-    hostname: "W11-STK-01",
-    type: "Desktop PC",
-    model: "Lenovo ThinkCentre M70q Tiny",
-    serial: "MJ087YTW",
-    user: "Magazzino Scorta",
-    location: "Stanza IT / Armadio Rack",
-    ip: "Non assegnato (DHCP)",
-    status: "Scorta Magazzino",
-    warrantyDate: "2027-12-31",
-    specs: "Intel Core i5-10400T / 16GB RAM / 256GB NVMe / Immagine Gold Windows 11 Pro"
-  },
-  {
-    id: "AST-006",
-    hostname: "SW-CORE-01",
-    type: "Apparato di Rete",
-    model: "Cisco Catalyst 2960-X (24G)",
-    serial: "FOC2133U091",
-    user: "Infrastruttura Rete",
-    location: "CED - Rack 42U",
+    hostname: "SW-CISCO-FL1",
+    type: "Dispositivo di Rete",
+    model: "Cisco Catalyst 1000 24P PoE+",
+    serial: "FOC241908LK",
+    user: "Infrastruttura Rete LAN",
+    department: "IT & Sistemi",
+    location: "Rack CED - Piano 1",
     ip: "192.168.1.2",
     status: "In Uso",
-    warrantyDate: "2025-04-10",
-    specs: "24 Porte PoE+ 10/100/1000 / 4 Porte SFP Uplink / VLAN 10 (Dati), 20 (VoIP)"
-  },
-  {
-    id: "AST-007",
-    hostname: "W11-MKT-01",
-    type: "Desktop PC",
-    model: "Dell Precision 3650 Tower",
-    serial: "8L09KP2",
-    user: "Simone Ferri",
-    location: "Marketing - Ufficio 3",
-    ip: "192.168.1.125",
-    status: "In Uso",
-    warrantyDate: "2027-05-18",
-    specs: "Intel Core i7-11700K / 32GB RAM / 1TB NVMe + 2TB HDD / NVIDIA T1000 / Win 11 Pro"
-  },
-  {
-    id: "AST-008",
-    hostname: "W11-STK-02",
-    type: "Laptop",
-    model: "Lenovo ThinkPad L14 Gen 2",
-    serial: "PF391XLM",
-    user: "Magazzino Scorta",
-    location: "Stanza IT - Cassaforte",
-    ip: "Non assegnato",
-    status: "Scorta Magazzino",
-    warrantyDate: "2028-01-15",
-    specs: "AMD Ryzen 5 PRO 5650U / 16GB RAM / 512GB NVMe / BitLocker Attivo / Win 11 Enterprise"
+    warranty: "2029-06-10",
+    specs: "Switch Layer 2 gestito, 24 porte Gigabit PoE+, 4 uplink SFP"
   }
 ];
 
-const POWERSHELL_TOOLS = [
+const TOOLKIT_ITEMS = [
   {
     id: "tool-spooler",
-    title: "Reset Coda di Stampa & Servizio Spooler",
-    category: "Hardware & Periferiche",
-    desc: "Arresta forzatamente il servizio Spooler di Windows, svuota i file di coda bloccati (.SPL/.SHD) e riavvia il servizio per sbloccare la stampante.",
-    code: `Stop-Service Spooler -Force
-Remove-Item -Path "$env:SystemRoot\\System32\\spool\\PRINTERS\\*" -Force -Recurse
-Start-Service Spooler
-Get-Service Spooler | Select-Object Name, Status, StartType`,
-    output: `Status   Name    StartType
-------   ----    ---------
-Running  Spooler Automatic`
+    title: "Reset Coda e Servizio Spooler di Stampa",
+    category: "Hardware & Stampanti",
+    desc: "Arresta lo Spooler Windows, elimina i file di stampa corrotti (.SPL e .SHD) nella cartella di sistema e riavvia il servizio.",
+    code: `Stop-Service -Name Spooler -Force\nRemove-Item -Path "C:\\Windows\\System32\\spool\\PRINTERS\\*" -Force -Recurse\nStart-Service -Name Spooler`,
+    output: `Servizio Spooler arrestato.\nFile di coda eliminati con successo.\nServizio Spooler riavviato e operativo.`
   },
   {
-    id: "tool-tcp-test",
-    title: "Verifica Porta TCP & Connettività Host (Test-NetConnection)",
+    id: "tool-dns",
+    title: "Svuotamento Cache DNS e Rinnovo DHCP",
     category: "Rete & Connettività",
-    desc: "Testa se una porta specifica (es. 445 per share SMB, 3389 per RDP o 9100 per stampanti) è aperta e raggiungibile sul firewall dell'host remoto.",
-    code: `# Esempio verifica share SMB o stampante di rete
-$HostName = "192.168.1.200"
-$Port = 9100
-Test-NetConnection -ComputerName $HostName -Port $Port -InformationLevel Detailed`,
-    output: `ComputerName            : 192.168.1.200
-RemoteAddress           : 192.168.1.200
-RemotePort              : 9100
-NameResolutionSucceeded : True
-PingSucceeded           : True
-PingReplyDetails        : RoundTripTime=0.84ms
-TcpTestSucceeded        : True`
+    desc: "Cancella le voci DNS locali e richiede una nuova concessione IP al server DHCP aziendale.",
+    code: `ipconfig /flushdns\nipconfig /release\nipconfig /renew`,
+    output: `Configurazione IP di Windows\n\nCache del resolver DNS svuotata.\nIndirizzo IPv4 rinnovato con successo: 192.168.1.112 /24.`
   },
   {
-    id: "tool-net-reset",
-    title: "Flush Cache DNS & Reset Stack TCP/IP",
-    category: "Rete & Connettività",
-    desc: "Svuota la cache DNS locale del client, rilascia e rinnova il leasing DHCP dal server e ripristina il catalogo Winsock.",
-    code: `ipconfig /flushdns
-ipconfig /release
-ipconfig /renew
-netsh winsock reset`,
-    output: `Configurazione IP di Windows
-Cache del resolver DNS svuotata.
-
-Adattatore Ethernet Ethernet 1:
-   Suffisso DNS specifico per connessione: corp.local
-   Indirizzo IPv4. . . . . . . . . . . . : 192.168.1.115
-   Subnet mask . . . . . . . . . . . . . : 255.255.255.0
-   Gateway predefinito . . . . . . . . . : 192.168.1.1`
+    id: "tool-port-test",
+    title: "Test Connessione Socket TCP su Porte di Servizio",
+    category: "Rete & Diagnostica",
+    desc: "Verifica se una porta socket remota (es. porta RAW 9100 o SMB 445) risponde senza bisogno di Telnet.",
+    code: `Test-NetConnection -ComputerName 192.168.1.200 -Port 9100`,
+    output: `ComputerName     : 192.168.1.200\nRemoteAddress    : 192.168.1.200\nRemotePort       : 9100\nTcpTestSucceeded : True`
   },
   {
-    id: "tool-bios-sn",
-    title: "Estrazione Matricola / Service Tag e Versione BIOS",
-    category: "Audit & Hardware",
-    desc: "Interroga WMI/CIM per rilevare istantaneamente il numero seriale del produttore (Dell Service Tag, seriale Lenovo/HP) e la versione BIOS.",
-    code: `Get-CimInstance Win32_BIOS | Select-Object Manufacturer, SMBIOSBIOSVersion, SerialNumber, ReleaseDate`,
-    output: `Manufacturer       : Dell Inc.
-SMBIOSBIOSVersion  : 2.15.1
-SerialNumber       : 7XG81P3
-ReleaseDate        : 14/09/2024 02:00:00`
-  },
-  {
-    id: "tool-smart-disk",
-    title: "Controllo Salute SSD/Disco Fisico (S.M.A.R.T.)",
-    category: "Audit & Hardware",
-    desc: "Verifica lo stato operativo e la salute dell'unità di memorizzazione fisica rilevata dal sottosistema Storage di Windows.",
-    code: `Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, HealthStatus, OperationalStatus, @{N="Size(GB)";E={[math]::Round($_.Size / 1GB, 2)}}`,
-    output: `DeviceId FriendlyName         MediaType HealthStatus OperationalStatus Size(GB)
--------- ------------         --------- ------------ ----------------- --------
-0        KIOXIA NVMe 512GB SSD SSD       Healthy      OK                476.94`
-  },
-  {
-    id: "tool-dism-sfc",
-    title: "Riparazione File di Sistema Windows (DISM + SFC)",
-    category: "Client Windows",
-    desc: "Esegue il controllo dell'archivio componenti di Windows Online con ripristino dell'immagine e verifica l'integrità di tutti i binari di sistema protetti.",
-    code: `# Riparazione archivio componenti e file protetti
-DISM /Online /Cleanup-Image /RestoreHealth
-sfc /scannow`,
-    output: `[==========================100.0%==========================] Operazione di ripristino completata.
-Archivio dei componenti riparato correttamente.
-
-Avvio dell'analisi del sistema.
-Protezione risorse di Windows: file danneggiati rilevati e ripristinati con successo.`
-  },
-  {
-    id: "tool-bitlocker",
-    title: "Verifica Stato Crittografia BitLocker & Modulo TPM",
-    category: "Sicurezza & Client",
-    desc: "Verifica se l'unità C: di sistema è protetta da crittografia hardware TPM e controlla lo stato della cifratura XTS-AES.",
-    code: `manage-bde -status C:
-Get-Tpm | Select-Object TpmPresent, TpmReady, ManufacturerVersion`,
-    output: `Volume C: [OSDisk]
-    Stato conversione:       Completamente crittografato
-    Percentuale crittografata: 100,0%
-    Metodo di crittografia:  XTS-AES 256
-    Stato protezione:        Protezione attivata
-    Protezioni con chiave:   TPM, Password numerica
-
-TpmPresent TpmReady ManufacturerVersion
----------- -------- -------------------
-True       True     2.0`
-  },
-  {
-    id: "tool-event-log",
-    title: "Estrazione Errori Critici dal Registro Eventi (Ultime 24h)",
-    category: "Diagnostica & Eventi",
-    desc: "Estrae gli eventi di livello Errore o Critico dal registro System di Windows nelle ultime 24 ore per diagnosticare crash o problemi hardware.",
-    code: `Get-WinEvent -FilterHashtable @{LogName='System'; Level=1,2; StartTime=(Get-Date).AddDays(-1)} -MaxEvents 15 | Select-Object TimeCreated, Id, ProviderName, Message | Format-Table -Wrap`,
-    output: `TimeCreated          Id ProviderName           Message
------------          -- ------------           -------
-23/11/2026 08:45:12 7000 Service Control Mgr   Il servizio Servizio Google Update non è stato avviato.
-22/11/2026 16:38:04 1001 BugCheck              Il computer è stato riavviato da un controllo errori (0x000000d1).`
+    id: "tool-sfc",
+    title: "Riparazione File di Sistema (DISM + SFC)",
+    category: "Manutenzione Windows",
+    desc: "Ripristina l'archivio componenti di Windows Online e analizza i binari protetti correggendo file corrotti.",
+    code: `DISM /Online /Cleanup-Image /RestoreHealth\nsfc /scannow`,
+    output: `Operazione di ripristino completata al 100%.\nProtezione risorse di Windows: file danneggiati ripristinati con successo.`
   }
 ];
 
-// =============================================================================
-// STATO APPLICATIVO
-// =============================================================================
+// ------------------------------------------------------------------------------
+// 2. STATO APPLICAZIONE (Caricamento & Salvataggio localStorage)
+// ------------------------------------------------------------------------------
+let tickets = caricaDati("it_tickets", DEFAULT_TICKETS);
+let assets = caricaDati("it_assets", DEFAULT_ASSETS);
+let currentView = "dashboard";
+let activeTicketId = null;
+let activeAssetId = null;
 
-class AppState {
-  constructor() {
-    this.tickets = this.loadData("it_tickets", DEFAULT_TICKETS);
-    this.assets = this.loadData("it_assets", DEFAULT_ASSETS);
-    this.currentView = "dashboard";
-    this.activeTicketId = null;
-    this.activeAssetId = null;
-  }
-
-  loadData(key, fallback) {
-    try {
-      const stored = localStorage.getItem(key);
-      return stored ? JSON.parse(stored) : fallback;
-    } catch (e) {
-      console.warn(`Errore caricamento dati per ${key}`, e);
-      return fallback;
-    }
-  }
-
-  saveData() {
-    try {
-      localStorage.setItem("it_tickets", JSON.stringify(this.tickets));
-      localStorage.setItem("it_assets", JSON.stringify(this.assets));
-    } catch (e) {
-      console.error("Errore salvataggio localStorage", e);
-    }
-  }
-
-  resetToDefault() {
-    this.tickets = JSON.parse(JSON.stringify(DEFAULT_TICKETS));
-    this.assets = JSON.parse(JSON.stringify(DEFAULT_ASSETS));
-    this.saveData();
+function caricaDati(key, fallback) {
+  try {
+    const salvati = localStorage.getItem(key);
+    return salvati ? JSON.parse(salvati) : fallback;
+  } catch (e) {
+    return fallback;
   }
 }
 
-const state = new AppState();
+function salvaDati() {
+  try {
+    localStorage.setItem("it_tickets", JSON.stringify(tickets));
+    localStorage.setItem("it_assets", JSON.stringify(assets));
+  } catch (e) {
+    console.error("Errore salvataggio localStorage:", e);
+  }
+}
 
-// =============================================================================
-// UTILITÀ HELPER
-// =============================================================================
+// ------------------------------------------------------------------------------
+// 3. INIZIALIZZAZIONE & EVENT LISTENERS
+// ------------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  setupNavigation();
+  setupFilterListeners();
+  setupModalListeners();
+  setupSubnetCalculator();
+  renderAll();
+});
 
-function showToast(message, type = "info") {
-  const container = document.getElementById("toast-container");
-  if (!container) return;
+function setupNavigation() {
+  document.querySelectorAll(".sidebar-nav .nav-item[data-view]").forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.preventDefault();
+      switchView(item.dataset.view);
+    });
+  });
 
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  
-  let iconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke-width="2"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"/></svg>`;
-  if (type === "success") {
-    iconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>`;
+  const btnGotoTickets = document.getElementById("btn-goto-tickets");
+  if (btnGotoTickets) btnGotoTickets.addEventListener("click", () => switchView("tickets"));
+
+  const btnQuickNewTicket = document.getElementById("btn-quick-new-ticket");
+  const btnCreateTicket = document.getElementById("btn-create-ticket-modal");
+  if (btnQuickNewTicket) btnQuickNewTicket.addEventListener("click", () => openModal("modal-ticket"));
+  if (btnCreateTicket) btnCreateTicket.addEventListener("click", () => openModal("modal-ticket"));
+
+  const btnQuickNewAsset = document.getElementById("btn-quick-new-asset");
+  const btnCreateAsset = document.getElementById("btn-create-asset-modal");
+  if (btnQuickNewAsset) btnQuickNewAsset.addEventListener("click", () => openModal("modal-asset"));
+  if (btnCreateAsset) btnCreateAsset.addEventListener("click", () => openModal("modal-asset"));
+
+  // Tasti rapidi dashboard
+  const btnSpooler = document.getElementById("btn-quick-spooler");
+  const btnFlush = document.getElementById("btn-quick-flushdns");
+  const btnCalc = document.getElementById("btn-quick-calc");
+
+  if (btnSpooler) btnSpooler.addEventListener("click", () => {
+    switchView("toolkit");
+    showToast("Aperto script PowerShell per reset Spooler di stampa", "info");
+  });
+  if (btnFlush) btnFlush.addEventListener("click", () => {
+    switchView("toolkit");
+    showToast("Aperto script flushdns e rinnovo DHCP", "info");
+  });
+  if (btnCalc) btnCalc.addEventListener("click", () => {
+    switchView("toolkit");
+    const ipInput = document.getElementById("subnet-ip");
+    if (ipInput) ipInput.focus();
+  });
+
+  // Esportazione Dati & Reset Demo
+  const btnExport = document.getElementById("btn-export-data");
+  if (btnExport) {
+    btnExport.addEventListener("click", (e) => {
+      e.preventDefault();
+      const backup = { tickets, assets, exportDate: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `IT_Support_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Backup JSON esportato con successo!", "success");
+    });
   }
 
-  toast.innerHTML = `${iconSvg}<span>${message}</span>`;
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(10px)";
-    toast.style.transition = "all 0.25s ease";
-    setTimeout(() => toast.remove(), 250);
-  }, 3200);
-}
-
-function getBadgeHtml(type, value) {
-  let cls = "";
-  if (type === "status") {
-    switch (value) {
-      case "Aperto": cls = "badge-open"; break;
-      case "In Lavorazione": cls = "badge-inprogress"; break;
-      case "In Attesa": cls = "badge-priority-high"; break;
-      case "Risolto": cls = "badge-resolved"; break;
-      case "Chiuso": cls = "badge-closed"; break;
-      default: cls = "badge-closed";
-    }
-  } else if (type === "priority") {
-    switch (value) {
-      case "Critica": cls = "badge-priority-critical"; break;
-      case "Alta": cls = "badge-priority-high"; break;
-      case "Media": cls = "badge-priority-medium"; break;
-      case "Bassa": cls = "badge-priority-low"; break;
-      default: cls = "badge-priority-low";
-    }
-  } else if (type === "asset-status") {
-    switch (value) {
-      case "In Uso": cls = "badge-asset-active"; break;
-      case "Scorta Magazzino": cls = "badge-asset-stock"; break;
-      case "In Riparazione": cls = "badge-asset-maintenance"; break;
-      case "Dismesso": cls = "badge-asset-retired"; break;
-      default: cls = "badge-asset-stock";
-    }
+  const btnReset = document.getElementById("btn-reset-demo");
+  if (btnReset) {
+    btnReset.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (confirm("Ripristinare tutti i ticket e gli asset ai dati demo iniziali?")) {
+        tickets = JSON.parse(JSON.stringify(DEFAULT_TICKETS));
+        assets = JSON.parse(JSON.stringify(DEFAULT_ASSETS));
+        salvaDati();
+        renderAll();
+        showToast("Dati demo ripristinati correttamente.", "info");
+      }
+    });
   }
-  return `<span class="badge ${cls}">${value}</span>`;
 }
-
-function isWarrantyActive(dateString) {
-  if (!dateString) return false;
-  const target = new Date(dateString);
-  const now = new Date();
-  return target >= now;
-}
-
-// =============================================================================
-// RENDERING DELLE VISTE
-// =============================================================================
 
 function switchView(viewName) {
-  state.currentView = viewName;
-
-  // Gestione classi sidebar
+  currentView = viewName;
   document.querySelectorAll(".sidebar-nav .nav-item").forEach(item => {
     if (item.dataset.view) {
       item.classList.toggle("active", item.dataset.view === viewName);
     }
   });
 
-  // Gestione sezioni visibili
   document.querySelectorAll(".view-section").forEach(sec => {
     sec.classList.remove("active");
   });
 
   const activeSec = document.getElementById(`view-${viewName}`);
-  if (activeSec) {
-    activeSec.classList.add("active");
-  }
+  if (activeSec) activeSec.classList.add("active");
 
-  // Aggiorna titolo pagina
-  const titleEl = document.getElementById("page-title");
-  if (titleEl) {
-    switch (viewName) {
-      case "dashboard": titleEl.textContent = "Pannello Assistenza & Ticket"; break;
-      case "tickets": titleEl.textContent = "Registro Richieste di Assistenza"; break;
-      case "assets": titleEl.textContent = "Registro Postazioni & Hardware"; break;
-      case "toolkit": titleEl.textContent = "Comandi Diagnostici PowerShell"; break;
-    }
-  }
+  const titles = {
+    dashboard: "Pannello Assistenza & Ticket",
+    tickets: "Coda Richieste di Assistenza IT",
+    assets: "Inventario Postazioni & Asset (CMDB)",
+    toolkit: "Strumenti Diagnostica & Script PowerShell"
+  };
+  const pageTitle = document.getElementById("page-title");
+  if (pageTitle && titles[viewName]) pageTitle.textContent = titles[viewName];
 
-  // Renderizza la vista corrente
   renderAll();
 }
 
-function renderKPIs() {
-  const openCount = state.tickets.filter(t => t.status !== "Risolto" && t.status !== "Chiuso").length;
-  const criticalCount = state.tickets.filter(t => (t.priority === "Critica" || t.priority === "Alta") && t.status !== "Chiuso" && t.status !== "Risolto").length;
-  const totalAssets = state.assets.length;
-  const stockAssets = state.assets.filter(a => a.status === "Scorta Magazzino").length;
-  const inUseAssets = state.assets.filter(a => a.status === "In Uso").length;
+function setupFilterListeners() {
+  const globalSearch = document.getElementById("global-search-input");
+  if (globalSearch) {
+    globalSearch.addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (q) {
+        if (currentView === "dashboard") switchView("tickets");
+        const ticketSearch = document.getElementById("filter-ticket-search");
+        if (ticketSearch) ticketSearch.value = q;
+        renderTickets();
+      }
+    });
+  }
 
-  document.getElementById("kpi-open-tickets").textContent = openCount;
-  document.getElementById("kpi-critical-tickets").textContent = criticalCount;
-  document.getElementById("kpi-total-assets").textContent = totalAssets;
-  document.getElementById("kpi-stock-assets").textContent = stockAssets;
-  document.getElementById("kpi-active-assets-sub").textContent = `${inUseAssets} postazioni attive in azienda`;
-  document.getElementById("sidebar-open-tickets-count").textContent = openCount;
+  ["filter-ticket-search", "filter-ticket-status", "filter-ticket-priority", "filter-ticket-category"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", renderTickets);
+  });
+
+  ["filter-asset-search", "filter-asset-type", "filter-asset-status"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", renderAssets);
+  });
+}
+
+function setupModalListeners() {
+  document.querySelectorAll("[data-close]").forEach(btn => {
+    btn.addEventListener("click", () => closeModal(btn.dataset.close));
+  });
+
+  // Chiusura cliccando l'overlay
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+
+  // Form Creazione Ticket
+  const formTicket = document.getElementById("form-ticket");
+  if (formTicket) {
+    formTicket.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newTicket = {
+        id: "TICK-" + (100 + tickets.length + 1),
+        user: document.getElementById("ticket-user").value,
+        department: document.getElementById("ticket-dept").value,
+        category: document.getElementById("ticket-category").value,
+        subject: document.getElementById("ticket-subject").value,
+        asset: document.getElementById("ticket-asset").value || "N/A",
+        priority: document.getElementById("ticket-priority").value,
+        status: "Aperto",
+        date: new Date().toISOString().slice(0, 16).replace("T", " "),
+        description: document.getElementById("ticket-desc").value,
+        worklog: [{ tech: "Valentyn Haidukov", date: new Date().toISOString().slice(0, 16).replace("T", " "), text: "Ticket aperto e preso in carico." }]
+      };
+
+      tickets.unshift(newTicket);
+      salvaDati();
+      closeModal("modal-ticket");
+      formTicket.reset();
+      renderAll();
+      showToast(`Ticket #${newTicket.id} registrato con successo!`, "success");
+    });
+  }
+
+  // Modifica Stato Ticket nel Dettaglio
+  const btnSaveStatus = document.getElementById("btn-save-ticket-status");
+  if (btnSaveStatus) {
+    btnSaveStatus.addEventListener("click", () => {
+      if (!activeTicketId) return;
+      const t = tickets.find(x => x.id === activeTicketId);
+      const newStatus = document.getElementById("detail-change-status").value;
+      if (t && newStatus) {
+        t.status = newStatus;
+        t.worklog.push({ tech: "Valentyn Haidukov", date: new Date().toISOString().slice(0, 16).replace("T", " "), text: `Stato ticket aggiornato a: ${newStatus}` });
+        salvaDati();
+        renderAll();
+        openTicketDetail(t.id);
+        showToast(`Stato ticket aggiornato a ${newStatus}`, "success");
+      }
+    });
+  }
+
+  // Aggiunta Nota / Worklog
+  const btnAddNote = document.getElementById("btn-add-ticket-note");
+  if (btnAddNote) {
+    btnAddNote.addEventListener("click", () => {
+      if (!activeTicketId) return;
+      const t = tickets.find(x => x.id === activeTicketId);
+      const noteInput = document.getElementById("detail-add-note");
+      const noteText = noteInput ? noteInput.value.trim() : "";
+      if (t && noteText) {
+        t.worklog.push({ tech: "Valentyn Haidukov", date: new Date().toISOString().slice(0, 16).replace("T", " "), text: noteText });
+        noteInput.value = "";
+        salvaDati();
+        renderAll();
+        openTicketDetail(t.id);
+        showToast("Nuova nota registrata nel worklog", "info");
+      }
+    });
+  }
+
+  // Form Creazione Asset
+  const formAsset = document.getElementById("form-asset");
+  if (formAsset) {
+    formAsset.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newAsset = {
+        id: "AST-" + String(assets.length + 1).padStart(3, "0"),
+        hostname: document.getElementById("asset-hostname").value,
+        type: document.getElementById("asset-type").value,
+        model: document.getElementById("asset-model").value,
+        serial: document.getElementById("asset-serial").value,
+        user: document.getElementById("asset-user").value || "Non assegnato",
+        department: "Generale",
+        location: document.getElementById("asset-location").value,
+        ip: document.getElementById("asset-ip").value || "DHCP",
+        status: document.getElementById("asset-status").value,
+        warranty: document.getElementById("asset-warranty-date").value,
+        specs: document.getElementById("asset-specs").value || "Configurazione standard"
+      };
+
+      assets.push(newAsset);
+      salvaDati();
+      closeModal("modal-asset");
+      formAsset.reset();
+      renderAll();
+      showToast(`Asset #${newAsset.id} (${newAsset.hostname}) censito correttamente!`, "success");
+    });
+  }
+}
+
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.add("active");
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.remove("active");
+}
+
+// ------------------------------------------------------------------------------
+// 4. RENDERING GRAFICO (Dashboard, Tabelle Ticket & Asset, Toolkit)
+// ------------------------------------------------------------------------------
+function renderAll() {
+  renderKPIs();
+  if (currentView === "dashboard") renderDashboard();
+  else if (currentView === "tickets") renderTickets();
+  else if (currentView === "assets") renderAssets();
+  else if (currentView === "toolkit") renderToolkit();
+}
+
+function renderKPIs() {
+  const openCount = tickets.filter(t => t.status === "Aperto" || t.status === "In Lavorazione").length;
+  const criticalCount = tickets.filter(t => t.priority === "Critica" && t.status !== "Chiuso" && t.status !== "Risolto").length;
+  const totalAssets = assets.length;
+  const stockAssets = assets.filter(a => a.status === "Scorta Magazzino").length;
+
+  const kpiOpen = document.getElementById("kpi-open-tickets");
+  const kpiCritical = document.getElementById("kpi-critical-tickets");
+  const kpiAssets = document.getElementById("kpi-total-assets");
+  const kpiStock = document.getElementById("kpi-stock-assets");
+  const sidebarCount = document.getElementById("sidebar-open-tickets-count");
+
+  if (kpiOpen) kpiOpen.textContent = openCount;
+  if (kpiCritical) kpiCritical.textContent = criticalCount;
+  if (kpiAssets) kpiAssets.textContent = totalAssets;
+  if (kpiStock) kpiStock.textContent = stockAssets;
+  if (sidebarCount) sidebarCount.textContent = openCount;
 }
 
 function renderDashboard() {
-  renderKPIs();
-
-  // Tabella ticket prioritari (ultimi aperti o in lavorazione)
   const tbody = document.getElementById("dashboard-tickets-tbody");
   if (!tbody) return;
 
-  const urgentTickets = state.tickets
-    .filter(t => t.status !== "Chiuso")
-    .sort((a, b) => {
-      const pWeights = { Critica: 4, Alta: 3, Media: 2, Bassa: 1 };
-      return (pWeights[b.priority] || 0) - (pWeights[a.priority] || 0);
-    })
-    .slice(0, 5);
-
-  if (urgentTickets.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Nessun ticket in attesa. Tutti gli interventi sono stati completati.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = urgentTickets.map(t => `
-    <tr>
-      <td style="font-family: var(--font-mono); font-weight: 600;">${t.id}</td>
-      <td>
-        <div style="font-weight: 600;">${t.user}</div>
-        <div style="font-size: 11px; color: var(--text-muted);">${t.department}</div>
-      </td>
-      <td>
-        <div style="font-weight: 500; max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.subject}</div>
-        <div style="font-size: 11px; color: var(--text-muted);">${t.category}</div>
-      </td>
-      <td>${getBadgeHtml("priority", t.priority)}</td>
-      <td>${getBadgeHtml("status", t.status)}</td>
-      <td>
-        <button class="btn btn-secondary btn-sm" onclick="openTicketDetail('${t.id}')">Gestisci</button>
-      </td>
+  const recenti = [...tickets].slice(0, 5);
+  tbody.innerHTML = recenti.map(t => `
+    <tr style="cursor: pointer;" onclick="openTicketDetail('${t.id}')">
+      <td><code>${t.id}</code></td>
+      <td><strong>${t.user}</strong></td>
+      <td>${t.subject}</td>
+      <td>${getBadge(t.priority)}</td>
+      <td>${getBadge(t.status)}</td>
     </tr>
   `).join("");
-
-  // Asset Breakdown
-  const breakdownEl = document.getElementById("dashboard-asset-breakdown");
-  if (breakdownEl) {
-    const types = ["Desktop PC", "Laptop", "Monitor", "Stampante di Rete", "Apparato di Rete"];
-    const total = state.assets.length || 1;
-
-    breakdownEl.innerHTML = types.map(tp => {
-      const cnt = state.assets.filter(a => a.type === tp).length;
-      const pct = Math.round((cnt / total) * 100);
-      return `
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span style="font-weight: 600; color: #334155;">${tp}</span>
-            <span style="font-family: var(--font-mono); color: var(--text-muted);">${cnt} unità (${pct}%)</span>
-          </div>
-          <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 3px; overflow: hidden;">
-            <div style="width: ${pct}%; height: 100%; background-color: var(--primary); border-radius: 3px;"></div>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
 }
 
 function renderTickets() {
   const tbody = document.getElementById("tickets-tbody");
   if (!tbody) return;
 
-  const searchVal = (document.getElementById("filter-ticket-search")?.value || "").toLowerCase().trim();
-  const statusFilter = document.getElementById("filter-ticket-status")?.value || "all";
-  const priorityFilter = document.getElementById("filter-ticket-priority")?.value || "all";
-  const catFilter = document.getElementById("filter-ticket-category")?.value || "all";
+  const q = (document.getElementById("filter-ticket-search")?.value || "").toLowerCase();
+  const fStatus = document.getElementById("filter-ticket-status")?.value || "all";
+  const fPriority = document.getElementById("filter-ticket-priority")?.value || "all";
+  const fCategory = document.getElementById("filter-ticket-category")?.value || "all";
 
-  const filtered = state.tickets.filter(t => {
-    if (statusFilter !== "all" && t.status !== statusFilter) return false;
-    if (priorityFilter !== "all" && t.priority !== priorityFilter) return false;
-    if (catFilter !== "all" && t.category !== catFilter) return false;
-
-    if (searchVal) {
-      const match = (
-        t.id.toLowerCase().includes(searchVal) ||
-        t.user.toLowerCase().includes(searchVal) ||
-        t.department.toLowerCase().includes(searchVal) ||
-        t.subject.toLowerCase().includes(searchVal) ||
-        t.description.toLowerCase().includes(searchVal) ||
-        (t.asset && t.asset.toLowerCase().includes(searchVal))
-      );
-      if (!match) return false;
-    }
-    return true;
+  const filtrati = tickets.filter(t => {
+    const matchQ = !q || t.id.toLowerCase().includes(q) || t.user.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q) || t.asset.toLowerCase().includes(q);
+    const matchStatus = (fStatus === "all" || t.status === fStatus);
+    const matchPriority = (fPriority === "all" || t.priority === fPriority);
+    const matchCategory = (fCategory === "all" || t.category === fCategory);
+    return matchQ && matchStatus && matchPriority && matchCategory;
   });
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 30px;">Nessun ticket corrispondente ai filtri impostati.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(t => `
-    <tr>
-      <td style="font-family: var(--font-mono); font-weight: 600;">${t.id}</td>
-      <td style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">${t.date}</td>
-      <td>
-        <div style="font-weight: 600;">${t.user}</div>
-        <div style="font-size: 11px; color: var(--text-muted);">${t.department}</div>
-      </td>
-      <td style="font-size: 12px;">${t.category}</td>
-      <td style="font-weight: 500;">
-        <div>${t.subject}</div>
-      </td>
-      <td style="font-size: 12px; font-family: var(--font-mono); color: #475569;">${t.asset || "Nessuno"}</td>
-      <td>${getBadgeHtml("priority", t.priority)}</td>
-      <td>${getBadgeHtml("status", t.status)}</td>
-      <td style="text-align: right;">
-        <button class="btn btn-secondary btn-sm" onclick="openTicketDetail('${t.id}')">Dettaglio</button>
-      </td>
+  tbody.innerHTML = filtrati.map(t => `
+    <tr style="cursor: pointer;" onclick="openTicketDetail('${t.id}')">
+      <td><code>${t.id}</code></td>
+      <td><strong>${t.user}</strong><div style="font-size: 0.72rem; color: #64748b;">${t.department}</div></td>
+      <td><div style="font-weight: 600;">${t.subject}</div><div style="font-size: 0.72rem; color: #64748b;">${t.category} &bull; ${t.asset}</div></td>
+      <td>${getBadge(t.priority)}</td>
+      <td>${getBadge(t.status)}</td>
+      <td style="font-size: 0.75rem; color: #64748b;">${t.date}</td>
     </tr>
   `).join("");
 }
@@ -620,552 +562,209 @@ function renderAssets() {
   const tbody = document.getElementById("assets-tbody");
   if (!tbody) return;
 
-  const searchVal = (document.getElementById("filter-asset-search")?.value || "").toLowerCase().trim();
-  const typeFilter = document.getElementById("filter-asset-type")?.value || "all";
-  const statusFilter = document.getElementById("filter-asset-status")?.value || "all";
-  const warrantyFilter = document.getElementById("filter-asset-warranty")?.value || "all";
+  const q = (document.getElementById("filter-asset-search")?.value || "").toLowerCase();
+  const fType = document.getElementById("filter-asset-type")?.value || "all";
+  const fStatus = document.getElementById("filter-asset-status")?.value || "all";
 
-  const filtered = state.assets.filter(a => {
-    if (typeFilter !== "all" && a.type !== typeFilter) return false;
-    if (statusFilter !== "all" && a.status !== statusFilter) return false;
-
-    if (warrantyFilter !== "all") {
-      const active = isWarrantyActive(a.warrantyDate);
-      if (warrantyFilter === "active" && !active) return false;
-      if (warrantyFilter === "expired" && active) return false;
-    }
-
-    if (searchVal) {
-      const match = (
-        a.id.toLowerCase().includes(searchVal) ||
-        a.hostname.toLowerCase().includes(searchVal) ||
-        a.model.toLowerCase().includes(searchVal) ||
-        a.serial.toLowerCase().includes(searchVal) ||
-        a.user.toLowerCase().includes(searchVal) ||
-        a.location.toLowerCase().includes(searchVal) ||
-        (a.ip && a.ip.toLowerCase().includes(searchVal))
-      );
-      if (!match) return false;
-    }
-    return true;
+  const filtrati = assets.filter(a => {
+    const matchQ = !q || a.hostname.toLowerCase().includes(q) || a.model.toLowerCase().includes(q) || a.serial.toLowerCase().includes(q) || a.user.toLowerCase().includes(q);
+    const matchType = (fType === "all" || a.type === fType);
+    const matchStatus = (fStatus === "all" || a.status === fStatus);
+    return matchQ && matchType && matchStatus;
   });
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--text-muted); padding: 30px;">Nessun asset corrispondente ai criteri selezionati.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(a => {
-    const active = isWarrantyActive(a.warrantyDate);
-    const warBadge = active 
-      ? `<span class="badge" style="background-color: #dcfce7; color: #166534;">Attiva (${a.warrantyDate})</span>`
-      : `<span class="badge" style="background-color: #fee2e2; color: #991b1b;">Scaduta (${a.warrantyDate})</span>`;
-
-    return `
-      <tr>
-        <td style="font-family: var(--font-mono); font-weight: 600;">${a.id}</td>
-        <td style="font-weight: 600; color: #0284c7;">${a.hostname}</td>
-        <td>${a.type}</td>
-        <td>${a.model}</td>
-        <td style="font-family: var(--font-mono); font-weight: 600;">${a.serial}</td>
-        <td>${a.user}</td>
-        <td style="font-size: 12px; color: var(--text-muted);">${a.location}</td>
-        <td style="font-family: var(--font-mono); font-size: 12px;">${a.ip || "-"}</td>
-        <td>${warBadge}</td>
-        <td>${getBadgeHtml("asset-status", a.status)}</td>
-        <td style="text-align: right;">
-          <button class="btn btn-secondary btn-sm" onclick="openAssetDetail('${a.id}')">Scheda</button>
-        </td>
-      </tr>
-    `;
-  }).join("");
+  tbody.innerHTML = filtrati.map(a => `
+    <tr style="cursor: pointer;" onclick="openAssetDetail('${a.id}')">
+      <td><code>${a.hostname}</code></td>
+      <td><strong>${a.model}</strong><div style="font-size: 0.72rem; color: #64748b;">${a.type}</div></td>
+      <td><code>${a.serial}</code></td>
+      <td>${a.user}</td>
+      <td>${getBadge(a.status)}</td>
+      <td><code>${a.ip}</code></td>
+    </tr>
+  `).join("");
 }
 
 function renderToolkit() {
-  const container = document.getElementById("toolkit-grid");
+  const container = document.getElementById("toolkit-scripts-list");
   if (!container) return;
 
-  container.innerHTML = POWERSHELL_TOOLS.map(t => `
-    <div class="tool-card" id="${t.id}">
-      <div class="tool-card-header">
-        <div class="tool-card-title">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb">
-            <polyline points="4 17 10 11 4 5" stroke-width="2"/>
-            <line x1="12" y1="19" x2="20" y2="19" stroke-width="2"/>
-          </svg>
-          <span>${t.title}</span>
-        </div>
-        <span class="tool-card-category">${t.category}</span>
+  container.innerHTML = TOOLKIT_ITEMS.map(item => `
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+        <h4 style="margin: 0; font-size: 1rem; color: #0f172a;">${item.title}</h4>
+        <span style="font-size: 0.72rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 4px; font-weight: 700;">${item.category}</span>
       </div>
-      <div class="tool-card-body">
-        <p class="tool-desc">${t.desc}</p>
-        <div class="code-box">
-          <code>${escapeHtml(t.code)}</code>
-        </div>
-        <div class="tool-actions">
-          <button class="btn btn-primary btn-sm" onclick="copyToolCode('${t.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
-            </svg>
-            <span>Copia PowerShell</span>
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="toggleSimOutput('${t.id}')">
-            <span>Simula Output Console</span>
-          </button>
-        </div>
-        <div class="sim-output-box" id="sim-${t.id}">
-          <div style="color: #94a3b8; margin-bottom: 4px; font-size: 10px; border-bottom: 1px solid #334155; padding-bottom: 2px;">
-            PS C:\\Windows\\system32> [Simulazione Ambiente Windows 11 Enterprise]
-          </div>
-          <pre style="margin: 0; font-family: inherit; font-size: inherit; white-space: pre-wrap;">${escapeHtml(t.output)}</pre>
-        </div>
+      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 0.75rem;">${item.desc}</p>
+      
+      <div style="background: #0f172a; color: #38bdf8; padding: 0.85rem; border-radius: 6px; font-family: monospace; font-size: 0.82rem; position: relative;">
+        <button onclick="copiaScript('${item.id}')" style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; cursor: pointer;">📋 Copia</button>
+        <pre style="margin: 0; white-space: pre-wrap;" id="code-${item.id}">${item.code}</pre>
       </div>
     </div>
   `).join("");
 }
 
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+function copiaScript(id) {
+  const el = document.getElementById(`code-${id}`);
+  if (el) {
+    navigator.clipboard.writeText(el.textContent);
+    showToast("Comando copiato negli appunti!", "success");
+  }
 }
 
-function renderAll() {
-  renderKPIs();
-  if (state.currentView === "dashboard") renderDashboard();
-  if (state.currentView === "tickets") renderTickets();
-  if (state.currentView === "assets") renderAssets();
-  if (state.currentView === "toolkit") renderToolkit();
-}
+// ------------------------------------------------------------------------------
+// 5. MODALI DETTAGLIO TICKET & ASSET
+// ------------------------------------------------------------------------------
+function openTicketDetail(id) {
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  activeTicketId = t.id;
 
-// =============================================================================
-// MODALI & DETTAGLI INTERATTIVI
-// =============================================================================
+  const titleEl = document.getElementById("detail-ticket-title");
+  const prioEl = document.getElementById("detail-ticket-priority-badge");
+  const statusEl = document.getElementById("detail-ticket-status-badge");
+  const catEl = document.getElementById("detail-ticket-cat-badge");
+  const userEl = document.getElementById("detail-ticket-user");
+  const deptEl = document.getElementById("detail-ticket-dept");
+  const assetEl = document.getElementById("detail-ticket-asset");
+  const descEl = document.getElementById("detail-ticket-desc");
+  const changeSelect = document.getElementById("detail-change-status");
+  const timelineEl = document.getElementById("detail-ticket-timeline");
 
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.add("open");
-}
+  if (titleEl) titleEl.textContent = `Ticket #${t.id}: ${t.subject}`;
+  if (prioEl) prioEl.innerHTML = getBadge(t.priority);
+  if (statusEl) statusEl.innerHTML = getBadge(t.status);
+  if (catEl) catEl.textContent = t.category;
+  if (userEl) userEl.textContent = t.user;
+  if (deptEl) deptEl.textContent = t.department;
+  if (assetEl) assetEl.textContent = t.asset;
+  if (descEl) descEl.textContent = t.description;
+  if (changeSelect) changeSelect.value = t.status;
 
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.remove("open");
-}
-
-// Dettaglio Ticket
-window.openTicketDetail = function(ticketId) {
-  const ticket = state.tickets.find(t => t.id === ticketId);
-  if (!ticket) return;
-
-  state.activeTicketId = ticketId;
-  document.getElementById("detail-ticket-title").textContent = `Dettaglio Intervento ${ticket.id} - ${ticket.subject}`;
-  document.getElementById("detail-ticket-date").textContent = `Registrato: ${ticket.date}`;
-  document.getElementById("detail-ticket-user").textContent = ticket.user;
-  document.getElementById("detail-ticket-dept").textContent = ticket.department;
-  document.getElementById("detail-ticket-asset").textContent = ticket.asset || "Nessun asset collegato";
-  document.getElementById("detail-ticket-desc").textContent = ticket.description;
-
-  document.getElementById("detail-ticket-priority-badge").className = "badge";
-  document.getElementById("detail-ticket-priority-badge").outerHTML = `<span id="detail-ticket-priority-badge">${getBadgeHtml("priority", ticket.priority)}</span>`;
-
-  document.getElementById("detail-ticket-status-badge").className = "badge";
-  document.getElementById("detail-ticket-status-badge").outerHTML = `<span id="detail-ticket-status-badge">${getBadgeHtml("status", ticket.status)}</span>`;
-
-  document.getElementById("detail-ticket-cat-badge").textContent = ticket.category;
-  document.getElementById("detail-change-status").value = ticket.status;
-
-  // Timeline interventi
-  const timeline = document.getElementById("detail-ticket-timeline");
-  if (ticket.worklog && ticket.worklog.length > 0) {
-    timeline.innerHTML = ticket.worklog.map(item => `
-      <div class="timeline-item">
-        <div class="timeline-header">
-          <span class="timeline-author">${item.tech}</span>
-          <span>${item.date}</span>
-        </div>
-        <div class="timeline-body">${item.text}</div>
+  if (timelineEl) {
+    timelineEl.innerHTML = t.worklog.map(w => `
+      <div style="border-left: 2px solid #38bdf8; padding-left: 0.85rem; margin-bottom: 0.85rem;">
+        <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">${w.tech} &bull; ${w.date}</div>
+        <div style="font-size: 0.85rem; color: #1e293b; margin-top: 0.2rem;">${w.text}</div>
       </div>
     `).join("");
-  } else {
-    timeline.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); font-style: italic;">Nessun intervento ancora registrato per questo ticket.</div>`;
   }
 
-  document.getElementById("detail-add-note").value = "";
   openModal("modal-ticket-detail");
-};
-
-// Dettaglio Asset
-window.openAssetDetail = function(assetId) {
-  const asset = state.assets.find(a => a.id === assetId);
-  if (!asset) return;
-
-  state.activeAssetId = assetId;
-  document.getElementById("detail-asset-title").textContent = `Scheda Asset ${asset.id} - ${asset.hostname}`;
-  document.getElementById("detail-asset-host").textContent = asset.hostname;
-  document.getElementById("detail-asset-type").textContent = asset.type;
-  document.getElementById("detail-asset-model").textContent = asset.model;
-  document.getElementById("detail-asset-serial").textContent = asset.serial;
-  document.getElementById("detail-asset-user").textContent = asset.user;
-  document.getElementById("detail-asset-loc").textContent = asset.location;
-  document.getElementById("detail-asset-ip").textContent = asset.ip || "Assegnazione dinamica DHCP";
-  document.getElementById("detail-asset-warranty").textContent = asset.warrantyDate;
-  document.getElementById("detail-asset-specs").textContent = asset.specs || "Configurazione hardware standard";
-
-  const active = isWarrantyActive(asset.warrantyDate);
-  const warBadge = active 
-    ? `<span class="badge" style="background-color: #dcfce7; color: #166534;">Garanzia Attiva (${asset.warrantyDate})</span>`
-    : `<span class="badge" style="background-color: #fee2e2; color: #991b1b;">Garanzia Scaduta (${asset.warrantyDate})</span>`;
-
-  document.getElementById("detail-asset-status-badge").outerHTML = `<span id="detail-asset-status-badge">${getBadgeHtml("asset-status", asset.status)}</span>`;
-  document.getElementById("detail-asset-warranty-badge").outerHTML = `<span id="detail-asset-warranty-badge">${warBadge}</span>`;
-
-  openModal("modal-asset-detail");
-};
-
-// Toolkit Copia & Toggle
-window.copyToolCode = function(toolId) {
-  const tool = POWERSHELL_TOOLS.find(t => t.id === toolId);
-  if (!tool) return;
-
-  navigator.clipboard.writeText(tool.code).then(() => {
-    showToast(`Comando PowerShell copiato negli appunti!`, "success");
-  }).catch(() => {
-    showToast("Errore durante la copia automatica negli appunti", "danger");
-  });
-};
-
-window.toggleSimOutput = function(toolId) {
-  const box = document.getElementById(`sim-${toolId}`);
-  if (box) {
-    box.classList.toggle("visible");
-  }
-};
-
-// =============================================================================
-// CALCOLATORE SUBNET IPV4
-// =============================================================================
-
-function calculateSubnet() {
-  const ipInput = document.getElementById("calc-ip")?.value.trim() || "192.168.1.1";
-  const cidr = parseInt(document.getElementById("calc-cidr")?.value || "24", 10);
-
-  const ipParts = ipInput.split(".").map(Number);
-  if (ipParts.length !== 4 || ipParts.some(p => isNaN(p) || p < 0 || p > 255)) {
-    return; // Formato IP non valido
-  }
-
-  const ipNum = (ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3];
-  const maskNum = cidr === 0 ? 0 : (~0 << (32 - cidr)) >>> 0;
-  const netNum = (ipNum & maskNum) >>> 0;
-  const bcastNum = (netNum | (~maskNum >>> 0)) >>> 0;
-
-  function numToIp(num) {
-    return [
-      (num >>> 24) & 255,
-      (num >>> 16) & 255,
-      (num >>> 8) & 255,
-      num & 255
-    ].join(".");
-  }
-
-  const netIp = numToIp(netNum);
-  const maskIp = numToIp(maskNum);
-  const bcastIp = numToIp(bcastNum);
-
-  let hostMin = numToIp(netNum + 1);
-  let hostMax = numToIp(bcastNum - 1);
-  if (cidr >= 31) {
-    hostMin = netIp;
-    hostMax = bcastIp;
-  }
-
-  document.getElementById("res-network").textContent = netIp;
-  document.getElementById("res-mask").textContent = maskIp;
-  document.getElementById("res-broadcast").textContent = bcastIp;
-  document.getElementById("res-range").textContent = `${hostMin} - ${hostMax}`;
 }
 
-// =============================================================================
-// GESTIONE EVENTI & INIZIALIZZAZIONE
-// =============================================================================
+function openAssetDetail(id) {
+  const a = assets.find(x => x.id === id);
+  if (!a) return;
+  activeAssetId = a.id;
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Setup navigazione sidebar
-  document.querySelectorAll(".sidebar-nav .nav-item").forEach(item => {
-    item.addEventListener("click", () => {
-      if (item.dataset.view) {
-        switchView(item.dataset.view);
-      }
-    });
-  });
+  const titleEl = document.getElementById("detail-asset-title");
+  const hostEl = document.getElementById("detail-asset-host");
+  const typeEl = document.getElementById("detail-asset-type");
+  const modelEl = document.getElementById("detail-asset-model");
+  const serialEl = document.getElementById("detail-asset-serial");
+  const userEl = document.getElementById("detail-asset-user");
+  const locEl = document.getElementById("detail-asset-loc");
+  const ipEl = document.getElementById("detail-asset-ip");
+  const warrantyEl = document.getElementById("detail-asset-warranty");
+  const specsEl = document.getElementById("detail-asset-specs");
 
-  // Filtri ticket
-  ["filter-ticket-search", "filter-ticket-status", "filter-ticket-priority", "filter-ticket-category"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("input", renderTickets);
-      el.addEventListener("change", renderTickets);
-    }
-  });
+  if (titleEl) titleEl.textContent = `Scheda Tecnica Asset #${a.id} (${a.hostname})`;
+  if (hostEl) hostEl.textContent = a.hostname;
+  if (typeEl) typeEl.textContent = a.type;
+  if (modelEl) modelEl.textContent = a.model;
+  if (serialEl) serialEl.textContent = a.serial;
+  if (userEl) userEl.textContent = a.user;
+  if (locEl) locEl.textContent = a.location;
+  if (ipEl) ipEl.textContent = a.ip;
+  if (warrantyEl) warrantyEl.textContent = a.warranty;
+  if (specsEl) specsEl.textContent = a.specs;
 
-  // Filtri asset
-  ["filter-asset-search", "filter-asset-type", "filter-asset-status", "filter-asset-warranty"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("input", renderAssets);
-      el.addEventListener("change", renderAssets);
-    }
-  });
+  openModal("modal-asset-detail");
+}
 
-  // Ricerca globale nel top header
-  const globalSearch = document.getElementById("global-search-input");
-  if (globalSearch) {
-    globalSearch.addEventListener("input", (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      if (!q) {
-        renderAll();
-        return;
-      }
-      // Se l'utente digita una ricerca globale, sincronizza i campi di ricerca della vista corrente
-      if (state.currentView === "tickets") {
-        const f = document.getElementById("filter-ticket-search");
-        if (f) { f.value = q; renderTickets(); }
-      } else if (state.currentView === "assets") {
-        const f = document.getElementById("filter-asset-search");
-        if (f) { f.value = q; renderAssets(); }
-      } else {
-        // Se è in dashboard, sposta su ticket desk o filtra
-        switchView("tickets");
-        const f = document.getElementById("filter-ticket-search");
-        if (f) { f.value = q; renderTickets(); }
-      }
-    });
+// ------------------------------------------------------------------------------
+// 6. CALCOLATORE SUBNET IPV4
+// ------------------------------------------------------------------------------
+function setupSubnetCalculator() {
+  const btn = document.getElementById("btn-calc-subnet");
+  if (btn) btn.addEventListener("click", calcolaSubnet);
+}
+
+function calcolaSubnet() {
+  const ipInput = document.getElementById("subnet-ip");
+  const cidrSelect = document.getElementById("subnet-cidr");
+  if (!ipInput || !cidrSelect) return;
+
+  const ipStr = ipInput.value.trim() || "192.168.1.0";
+  const cidr = parseInt(cidrSelect.value, 10) || 24;
+
+  const parts = ipStr.split(".").map(x => parseInt(x, 10));
+  if (parts.length !== 4 || parts.some(n => isNaN(n) || n < 0 || n > 255)) {
+    showToast("Indirizzo IP non valido. Inserire formato es. 192.168.1.0", "error");
+    return;
   }
 
-  // Pulsanti rapidi header
-  document.getElementById("btn-quick-new-ticket")?.addEventListener("click", () => openModal("modal-ticket"));
-  document.getElementById("btn-create-ticket-modal")?.addEventListener("click", () => openModal("modal-ticket"));
-  document.getElementById("btn-quick-new-asset")?.addEventListener("click", () => openModal("modal-asset"));
-  document.getElementById("btn-create-asset-modal")?.addEventListener("click", () => openModal("modal-asset"));
-  document.getElementById("btn-goto-tickets")?.addEventListener("click", () => switchView("tickets"));
+  const maskInt = ~((1 << (32 - cidr)) - 1) >>> 0;
+  const ipInt = ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0;
+  const netInt = (ipInt & maskInt) >>> 0;
+  const broadInt = (netInt | ~maskInt) >>> 0;
 
-  // Scorciatoie Toolkit in Dashboard
-  document.getElementById("btn-quick-spooler")?.addEventListener("click", () => {
-    switchView("toolkit");
-    setTimeout(() => {
-      const el = document.getElementById("tool-spooler");
-      el?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  });
-  document.getElementById("btn-quick-flushdns")?.addEventListener("click", () => {
-    switchView("toolkit");
-    setTimeout(() => {
-      const el = document.getElementById("tool-net-reset");
-      el?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  });
-  document.getElementById("btn-quick-calc")?.addEventListener("click", () => {
-    switchView("toolkit");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  const intToIp = (val) => `${(val >>> 24) & 255}.${(val >>> 16) & 255}.${(val >>> 8) & 255}.${val & 255}`;
+  const totalHosts = Math.pow(2, 32 - cidr);
+  const usableHosts = Math.max(0, totalHosts - 2);
 
-  // Chiusura modali su click backdrop e pulsanti [data-close]
-  document.querySelectorAll("[data-close]").forEach(btn => {
-    btn.addEventListener("click", () => closeModal(btn.dataset.close));
-  });
+  const resNet = document.getElementById("sub-res-network");
+  const resMask = document.getElementById("sub-res-mask");
+  const resRange = document.getElementById("sub-res-range");
+  const resBroad = document.getElementById("sub-res-broadcast");
+  const resHosts = document.getElementById("sub-res-hosts");
 
-  document.querySelectorAll(".modal-overlay").forEach(overlay => {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        overlay.classList.remove("open");
-      }
-    });
-  });
+  if (resNet) resNet.textContent = `${intToIp(netInt)} /${cidr}`;
+  if (resMask) resMask.textContent = intToIp(maskInt);
+  if (resRange) resRange.textContent = `${intToIp(netInt + 1)} - ${intToIp(broadInt - 1)}`;
+  if (resBroad) resBroad.textContent = intToIp(broadInt);
+  if (resHosts) resHosts.textContent = `${usableHosts} indirizzi assegnabili`;
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      document.querySelectorAll(".modal-overlay.open").forEach(m => m.classList.remove("open"));
-    }
-  });
+  showToast(`Calcolata subnet /${cidr} con successo!`, "success");
+}
 
-  // Form Creazione Nuovo Ticket
-  const formTicket = document.getElementById("form-ticket");
-  if (formTicket) {
-    formTicket.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nextNum = state.tickets.length + 101;
-      const newId = `TICK-${nextNum}`;
+// ------------------------------------------------------------------------------
+// 7. HELPER BADGE & TOAST NOTIFICHE
+// ------------------------------------------------------------------------------
+function getBadge(val) {
+  let bg = "#f1f5f9";
+  let col = "#475569";
 
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-      const newTicket = {
-        id: newId,
-        user: document.getElementById("ticket-user").value.trim(),
-        department: document.getElementById("ticket-dept").value.trim(),
-        category: document.getElementById("ticket-cat").value,
-        priority: document.getElementById("ticket-priority").value,
-        asset: document.getElementById("ticket-asset").value.trim() || "Nessun asset specificato",
-        subject: document.getElementById("ticket-subject").value.trim(),
-        description: document.getElementById("ticket-desc").value.trim(),
-        status: "Aperto",
-        date: dateStr,
-        worklog: [
-          {
-            tech: "Valentyn Haidukov",
-            date: dateStr,
-            text: "Ticket creato e preso in carico in coda di supporto L1."
-          }
-        ]
-      };
-
-      state.tickets.unshift(newTicket);
-      state.saveData();
-      formTicket.reset();
-      closeModal("modal-ticket");
-      showToast(`Ticket ${newId} registrato con successo!`, "success");
-      renderAll();
-    });
+  switch (val) {
+    case "Aperto": bg = "#fee2e2"; col = "#dc2626"; break;
+    case "In Lavorazione": bg = "#fef3c7"; col = "#d97706"; break;
+    case "In Attesa": bg = "#f3e8ff"; col = "#9333ea"; break;
+    case "Risolto": case "Chiuso": bg = "#dcfce7"; col = "#16a34a"; break;
+    case "Critica": bg = "#fee2e2"; col = "#b91c1c"; break;
+    case "Alta": bg = "#ffedd5"; col = "#c2410c"; break;
+    case "Media": bg = "#fef3c7"; col = "#b45309"; break;
+    case "Bassa": bg = "#f0fdf4"; col = "#15803d"; break;
+    case "In Uso": bg = "#dcfce7"; col = "#15803d"; break;
+    case "Scorta Magazzino": bg = "#e0f2fe"; col = "#0284c7"; break;
+    case "In Riparazione": bg = "#fee2e2"; col = "#b91c1c"; break;
   }
+  return `<span style="background:${bg}; color:${col}; font-weight:700; padding:2px 8px; border-radius:6px; font-size:0.75rem;">${val}</span>`;
+}
 
-  // Form Creazione Nuovo Asset
-  const formAsset = document.getElementById("form-asset");
-  if (formAsset) {
-    formAsset.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nextNum = String(state.assets.length + 1).padStart(3, '0');
-      const newId = `AST-${nextNum}`;
-
-      const newAsset = {
-        id: newId,
-        hostname: document.getElementById("asset-hostname").value.trim().toUpperCase(),
-        type: document.getElementById("asset-type").value,
-        model: document.getElementById("asset-model").value.trim(),
-        serial: document.getElementById("asset-serial").value.trim().toUpperCase(),
-        user: document.getElementById("asset-user").value.trim() || "Magazzino Scorta",
-        location: document.getElementById("asset-location").value.trim(),
-        ip: document.getElementById("asset-ip").value.trim() || "DHCP Dinamico",
-        status: document.getElementById("asset-status").value,
-        warrantyDate: document.getElementById("asset-warranty-date").value,
-        specs: document.getElementById("asset-specs").value.trim() || "Specifiche hardware standard"
-      };
-
-      state.assets.unshift(newAsset);
-      state.saveData();
-      formAsset.reset();
-      closeModal("modal-asset");
-      showToast(`Asset ${newId} (${newAsset.hostname}) registrato nel CMDB!`, "success");
-      renderAll();
-    });
-  }
-
-  // Salvataggio Modifiche Ticket nel Dettaglio (Cambio Stato & Aggiunta Nota)
-  document.getElementById("btn-save-ticket-status")?.addEventListener("click", () => {
-    if (!state.activeTicketId) return;
-    const ticket = state.tickets.find(t => t.id === state.activeTicketId);
-    if (!ticket) return;
-
-    const newStatus = document.getElementById("detail-change-status").value;
-    ticket.status = newStatus;
-    state.saveData();
-    showToast(`Stato ticket aggiornato a '${newStatus}'`, "success");
-    openTicketDetail(ticket.id);
-    renderAll();
-  });
-
-  document.getElementById("btn-add-ticket-note")?.addEventListener("click", () => {
-    if (!state.activeTicketId) return;
-    const ticket = state.tickets.find(t => t.id === state.activeTicketId);
-    if (!ticket) return;
-
-    const noteText = document.getElementById("detail-add-note")?.value.trim();
-    if (!noteText) {
-      showToast("Inserisci del testo per registrare la nota tecnica", "danger");
-      return;
-    }
-
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    if (!ticket.worklog) ticket.worklog = [];
-    ticket.worklog.push({
-      tech: "Valentyn Haidukov",
-      date: dateStr,
-      text: noteText
-    });
-
-    state.saveData();
-    showToast("Nota tecnica aggiunta allo storico!", "success");
-    openTicketDetail(ticket.id);
-  });
-
-  // Calcolatore Subnet
-  document.getElementById("calc-ip")?.addEventListener("input", calculateSubnet);
-  document.getElementById("calc-cidr")?.addEventListener("change", calculateSubnet);
-  calculateSubnet();
-
-  // Esportazione CSV Asset
-  document.getElementById("btn-export-assets-csv")?.addEventListener("click", () => {
-    const headers = ["ID", "Hostname", "Tipo", "Modello", "Matricola_SN", "Utente", "Ufficio", "IP", "Stato", "Scadenza_Garanzia", "Specifiche"];
-    const rows = state.assets.map(a => [
-      a.id,
-      a.hostname,
-      a.type,
-      `"${a.model}"`,
-      a.serial,
-      `"${a.user}"`,
-      `"${a.location}"`,
-      a.ip,
-      a.status,
-      a.warrantyDate,
-      `"${(a.specs || '').replace(/"/g, '""')}"`
-    ]);
-
-    const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(r => r.join(";"))].join("\r\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Inventario_Asset_IT_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("File CSV inventario scaricato con successo!", "success");
-  });
-
-  // Esportazione Backup JSON
-  document.getElementById("btn-export-data")?.addEventListener("click", () => {
-    const backupData = {
-      exportDate: new Date().toISOString(),
-      technician: "Valentyn Haidukov",
-      tickets: state.tickets,
-      assets: state.assets
-    };
-    const jsonStr = JSON.stringify(backupData, null, 2);
-    const blob = new Blob([jsonStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Backup_IT_Support_Hub_${new Date().toISOString().slice(0, 10)}.json`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("Backup JSON esportato correttamente!", "success");
-  });
-
-  // Reset Dati Demo
-  document.getElementById("btn-reset-demo")?.addEventListener("click", () => {
-    if (confirm("Vuoi ripristinare tutti i dati dimostrativi di fabbrica (ticket ed asset)?")) {
-      state.resetToDefault();
-      renderAll();
-      showToast("Dati dimostrativi ripristinati con successo!", "success");
-    }
-  });
-
-  // Avvio iniziale
-  renderAll();
-});
+function showToast(msg, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const t = document.createElement("div");
+  t.style.cssText = "background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 8px; margin-top: 8px; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; border-left: 4px solid #38bdf8;";
+  if (type === "success") t.style.borderLeftColor = "#22c55e";
+  if (type === "error") t.style.borderLeftColor = "#ef4444";
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    t.style.transition = "opacity 0.3s ease";
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}

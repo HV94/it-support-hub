@@ -48,7 +48,7 @@ Raccolta di comandi pronti all'uso per risolvere i problemi più frequenti senza
 
 L'applicazione è sviluppata in **HTML5, CSS3 e JavaScript Vanilla** (nessun framework esterno, caricamento rapido e utilizzabile offline). 
 
-L'architettura e l'impostazione dei flussi operativi sono stati definiti con l'ausilio di assistenti AI per accelerare la scrittura del codice dell'interfaccia, concentrando il lavoro sull'esattezza dei comandi sistemistici e delle procedure reali di supporto tecnico.
+L'applicazione è progettata per riflettere le procedure standard di un ambiente Help Desk aziendale, focalizzandosi sull'esattezza dei comandi sistemistici e delle procedure reali di supporto tecnico.
 I dati vengono salvati automaticamente nel `localStorage` del browser, con possibilità di esportare un backup in JSON o ripristinare i dati di prova iniziali.
 
 ---
