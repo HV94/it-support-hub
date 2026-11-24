@@ -209,6 +209,13 @@ function setupTabs() {
   document.getElementById("btn-open-new-ticket")?.addEventListener("click", () => openModal("modal-new-ticket"));
   document.getElementById("btn-open-new-asset")?.addEventListener("click", () => openModal("modal-new-asset"));
   document.getElementById("btn-export-backup")?.addEventListener("click", exportBackupJSON);
+
+  // Supporto URL hash (es. #assets o #tools)
+  const initialHash = window.location.hash.replace("#", "");
+  if (initialHash && ["tickets", "assets", "tools"].includes(initialHash)) {
+    const tabEl = document.getElementById(`tab-btn-${initialHash}`);
+    if (tabEl) tabEl.click();
+  }
 }
 
 // GESTIONE RICERCA VELOCE
@@ -337,7 +344,7 @@ function renderTicketTable() {
     else if (t.status === "Chiuso") statusClass = "badge-status-chiuso";
 
     return `
-      <tr>
+      <tr onclick="openTicketDetailModal('${t.id}')" title="Clicca per aprire la scheda dettagli e lavorare sul ticket">
         <td>
           <span class="ticket-id-badge">#${t.id}</span>
           <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px;">${t.date.split(" ")[0]}</div>
@@ -362,16 +369,16 @@ function renderTicketTable() {
         </td>
         <td>
           <div class="action-buttons-cell">
-            <button class="btn btn-secondary btn-sm" onclick="openTicketDetailModal('${t.id}')" title="Apri scheda dettagli">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openTicketDetailModal('${t.id}')" title="Apri scheda dettagli">
               🔍 Dettagli
             </button>
             ${!isResolved ? `
-              <button class="btn btn-success btn-sm" onclick="quickResolveTicket('${t.id}')" title="Segna come risolto">
+              <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); quickResolveTicket('${t.id}')" title="Segna come risolto">
                 ✓ Risolvi
               </button>
             ` : ''}
             ${isOpening ? `
-              <button class="btn btn-primary btn-sm" onclick="quickTakeTicket('${t.id}')" title="Prendi in carico">
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); quickTakeTicket('${t.id}')" title="Prendi in carico">
                 ⚙️ Prendi
               </button>
             ` : ''}
@@ -412,7 +419,15 @@ function renderAssetsGrid() {
           <div>Matricola: <span style="font-family: monospace;">${a.serial}</span></div>
         </div>
 
-        <div class="asset-card-footer">
+        <div class="asset-card-footer" style="display: flex; flex-direction: column; gap: 0.45rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem;">
+            <button class="btn btn-secondary btn-sm" onclick="runPingModal('${a.id}')" title="Esegui test connettività di rete ICMP">
+              📶 Ping Test
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openRemoteAssistModal('${a.id}')" title="Avvia sessione remota Quick Assist">
+              🖥️ Remoto
+            </button>
+          </div>
           <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="openAssetDetailModal('${a.id}')">
             🔍 Scheda Tecnica & Specifiche
           </button>
@@ -699,3 +714,130 @@ function showToast(msg, type = "info") {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+// 12. SIMULATORE AVANZATO PING ICMP (INVENTARIO DISPOSITIVI)
+let activePingAssetId = null;
+let activeRemoteAssetId = null;
+
+function runPingModal(assetId) {
+  const a = assets.find(x => x.id === assetId);
+  if (!a) return;
+  activePingAssetId = assetId;
+
+  const targetHost = a.ip.includes(" ") ? a.ip.split(" ")[0] : (a.ip === "DHCP Dinamico" ? "192.168.1.150" : a.ip);
+  document.getElementById("modal-ping-host").textContent = `PING: ${a.hostname} (${targetHost})`;
+  const term = document.getElementById("ping-terminal-output");
+  const indicator = document.getElementById("ping-status-indicator");
+  indicator.textContent = "⏳ Esecuzione test ICMP in corso...";
+  indicator.style.color = "#d97706";
+
+  term.innerHTML = `<div style="color: #cbd5e1; margin-bottom: 0.5rem;">PS C:\\SupportoIT> ping -n 4 ${targetHost}</div><div style="color: #94a3b8; margin-bottom: 0.5rem;">Esecuzione Ping verso [${a.hostname}] con IP ${targetHost} (32 byte di dati):</div>`;
+  openModal("modal-ping-test");
+
+  const replies = [
+    { seq: 1, bytes: 32, ms: (Math.random() * 0.8 + 0.6).toFixed(1), ttl: 128 },
+    { seq: 2, bytes: 32, ms: (Math.random() * 0.8 + 0.6).toFixed(1), ttl: 128 },
+    { seq: 3, bytes: 32, ms: (Math.random() * 0.8 + 0.6).toFixed(1), ttl: 128 },
+    { seq: 4, bytes: 32, ms: (Math.random() * 0.8 + 0.6).toFixed(1), ttl: 128 },
+  ];
+
+  replies.forEach((r, idx) => {
+    setTimeout(() => {
+      const line = document.createElement("div");
+      line.style.color = "#38bdf8";
+      line.textContent = `Risposta da ${targetHost}: byte=${r.bytes} tempo=${r.ms}ms TTL=${r.ttl}`;
+      term.appendChild(line);
+
+      if (idx === 3) {
+        setTimeout(() => {
+          const stats = document.createElement("div");
+          stats.style.marginTop = "0.75rem";
+          stats.style.paddingTop = "0.5rem";
+          stats.style.borderTop = "1px solid #334155";
+          stats.style.color = "#4ade80";
+          stats.innerHTML = `
+            <strong>Statistiche Ping per ${targetHost}:</strong><br>
+            Pacchetti: Trasmessi = 4, Ricevuti = 4, Persi = 0 (0% persi)<br>
+            Tempi andata/ritorno: Minimo = 0.6ms, Massimo = 1.4ms, Medio = 0.9ms
+          `;
+          term.appendChild(stats);
+          indicator.textContent = "✓ HOST ONLINE & RAGGIUNGIBILE (0% perdita pacchetti)";
+          indicator.style.color = "#10b981";
+        }, 250);
+      }
+    }, (idx + 1) * 300);
+  });
+}
+
+function repeatActivePing() {
+  if (activePingAssetId) {
+    runPingModal(activePingAssetId);
+  }
+}
+
+// 13. SIMULATORE ASSISTENZA REMOTA (RDP / QUICK ASSIST)
+function openRemoteAssistModal(assetId) {
+  const a = assets.find(x => x.id === assetId);
+  if (!a) return;
+  activeRemoteAssetId = assetId;
+
+  document.getElementById("remote-assist-title").textContent = `Sessione Assistenza Remota - ${a.hostname}`;
+  document.getElementById("remote-assist-subtitle").textContent = `${a.model} • Utente: ${a.user} • IP: ${a.ip}`;
+
+  const connectingBox = document.getElementById("remote-assist-connecting");
+  const connectedBox = document.getElementById("remote-assist-connected");
+  const resultBox = document.getElementById("remote-action-result");
+
+  connectingBox.classList.remove("hidden");
+  connectedBox.classList.add("hidden");
+  resultBox.classList.add("hidden");
+  resultBox.textContent = "";
+
+  openModal("modal-remote-assist");
+
+  setTimeout(() => {
+    connectingBox.classList.add("hidden");
+    connectedBox.classList.remove("hidden");
+    document.getElementById("remote-cpu-load").textContent = `${Math.floor(Math.random() * 20 + 8)}%`;
+    document.getElementById("remote-ram-load").textContent = `${(Math.random() * 4 + 4.5).toFixed(1)} / 16 GB`;
+    document.getElementById("remote-uptime").textContent = `${Math.floor(Math.random() * 5 + 1)}g ${Math.floor(Math.random() * 20 + 1)}h`;
+    showToast(`Sessione remota connessa con successo a ${a.hostname}!`, "success");
+  }, 800);
+}
+
+function runRemoteAction(action) {
+  const resultBox = document.getElementById("remote-action-result");
+  resultBox.classList.remove("hidden");
+  resultBox.style.color = "#fcd34d";
+  resultBox.textContent = "⏳ Esecuzione comando sulla postazione remota in corso...";
+
+  setTimeout(() => {
+    resultBox.style.color = "#4ade80";
+    if (action === "gpupdate") {
+      resultBox.innerHTML = `<strong>PS C:\\WINDOWS\\system32> gpupdate /force</strong><br>Aggiornamento criteri utente e computer in corso...<br>✓ Criteri di Gruppo (GPO) aggiornati con successo senza errori.`;
+      showToast("Criteri di Gruppo GPO aggiornati sul client!", "success");
+    } else if (action === "spooler") {
+      resultBox.innerHTML = `<strong>PS C:\\WINDOWS\\system32> Restart-Service Spooler -Force</strong><br>Servizio Spooler arrestato.<br>✓ Servizio Spooler riavviato e code pulite.`;
+      showToast("Spooler di stampa riavviato sulla postazione!", "success");
+    } else if (action === "eventvwr") {
+      resultBox.innerHTML = `<strong>PS C:\\WINDOWS\\system32> Get-EventLog -LogName System -Newest 10</strong><br>Event ID 1074: Arresto regolare del sistema.<br>Event ID 7036: Servizio Windows Update avviato.<br>✓ Nessun errore critico rilevato nei registri.`;
+      showToast("Registri eventi verificati: nessun errore critico!", "info");
+    } else if (action === "sfc") {
+      resultBox.innerHTML = `<strong>PS C:\\WINDOWS\\system32> sfc /scannow</strong><br>Verifica del file system di Windows completata al 100%.<br>✓ Protezione risorse di Windows: nessuna violazione di integrità trovata.`;
+      showToast("Scansione sfc completata con successo!", "success");
+    }
+  }, 500);
+}
+
+function disconnectRemoteAssist() {
+  closeModal("modal-remote-assist");
+  showToast("Sessione di assistenza remota terminata.", "info");
+}
+
+// Invia nota con tasto Invio
+document.getElementById("input-new-note")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addNoteToActiveTicket();
+  }
+});

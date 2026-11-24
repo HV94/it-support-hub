@@ -40,12 +40,12 @@
         </button>
         <button class="nav-tab" data-tab="assets" id="tab-btn-assets">
           <span class="tab-icon">🖥️</span>
-          <span class="tab-label">Inventario PC & Dispositivi</span>
+          <span class="tab-label">Postazioni PC</span>
           <span class="tab-count" id="count-total-assets">(5)</span>
         </button>
         <button class="nav-tab" data-tab="tools" id="tab-btn-tools">
           <span class="tab-icon">🛠️</span>
-          <span class="tab-label">Strumenti Rapidi Help Desk</span>
+          <span class="tab-label">Strumenti Rapidi</span>
         </button>
       </div>
 
@@ -467,6 +467,94 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modal-asset-detail')">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE 4: SIMULATORE TEST PING & DIAGNOSTICA RETE -->
+  <div class="modal-overlay hidden" id="modal-ping-test">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge-id" id="modal-ping-host">PING: HOST</span>
+          <h2 class="modal-title">Diagnostica Connettività ICMP (Ping Test)</h2>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('modal-ping-test')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #0f172a; color: #38bdf8; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.88rem; padding: 1.25rem; border-radius: 8px; line-height: 1.6; min-height: 220px;" id="ping-terminal-output">
+          <div style="color: #94a3b8;">Avvio test diagnostico ICMP...</div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <span id="ping-status-indicator" style="font-size: 0.85rem; font-weight: 700; color: #64748b;">Inizializzazione socket...</span>
+        <div>
+          <button class="btn btn-primary btn-sm" id="btn-re-ping" onclick="repeatActivePing()">🔄 Ripeti Ping</button>
+          <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-ping-test')">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE 5: SIMULATORE ASSISTENZA REMOTA (RDP / QUICK ASSIST) -->
+  <div class="modal-overlay hidden" id="modal-remote-assist">
+    <div class="modal-box" style="max-width: 700px;">
+      <div class="modal-header" style="background: #1e293b; color: #ffffff; border-radius: 12px 12px 0 0;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.3rem;">🖥️</span>
+          <div>
+            <h2 class="modal-title" style="color: #ffffff; font-size: 1.1rem;" id="remote-assist-title">Sessione Assistenza Remota - Host</h2>
+            <div style="font-size: 0.75rem; color: #38bdf8;" id="remote-assist-subtitle">Connessione cifrata TLS &bull; Operatore: Valentyn Haidukov</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" style="color: #ffffff;" onclick="closeModal('modal-remote-assist')">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem;">
+        <div id="remote-assist-connecting" style="text-align: center; padding: 2rem;">
+          <div style="font-size: 2.5rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">🔄</div>
+          <h3 style="font-size: 1.1rem; color: #0f172a; margin-bottom: 0.5rem;">Stabilimento Connessione Quick Assist in corso...</h3>
+          <p style="color: #64748b; font-size: 0.85rem;">Autenticazione con agente di supporto IT remoto su porta sicura 443/3389</p>
+        </div>
+
+        <div id="remote-assist-connected" class="hidden">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #065f46; font-weight: 700; font-size: 0.9rem;">
+              <span>🟢</span> <span>SESSIONE REMOTA ATTIVA E CONDIVISA</span>
+            </div>
+            <span style="font-size: 0.8rem; background: #10b981; color: #ffffff; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">60 FPS &bull; Latenza: 14ms</span>
+          </div>
+
+          <!-- Remote System Telemetry -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Utilizzo CPU</div>
+              <div style="font-size: 1.25rem; font-weight: 800; color: #2563eb;" id="remote-cpu-load">12%</div>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Memoria RAM</div>
+              <div style="font-size: 1.25rem; font-weight: 800; color: #059669;" id="remote-ram-load">6.4 / 16 GB</div>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; text-align: center;">
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Uptime di Sistema</div>
+              <div style="font-size: 1.25rem; font-weight: 800; color: #7c3aed;" id="remote-uptime">3g 14h 22m</div>
+            </div>
+          </div>
+
+          <!-- Quick Remote Actions -->
+          <h4 style="font-size: 0.85rem; font-weight: 800; color: #334155; text-transform: uppercase; margin-bottom: 0.6rem; letter-spacing: 0.04em;">Azioni Dirette sulla Postazione Remota:</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+            <button class="btn btn-secondary btn-sm" onclick="runRemoteAction('gpupdate')">⚡ gpupdate /force (Policy AD)</button>
+            <button class="btn btn-secondary btn-sm" onclick="runRemoteAction('spooler')">🖨️ Riavvia Spooler di Stampa</button>
+            <button class="btn btn-secondary btn-sm" onclick="runRemoteAction('eventvwr')">📋 Controlla Errori Event Log</button>
+            <button class="btn btn-secondary btn-sm" onclick="runRemoteAction('sfc')">🛡️ Scansione Integrità sfc /scannow</button>
+          </div>
+
+          <div id="remote-action-result" class="hidden" style="margin-top: 1rem; background: #0f172a; color: #38bdf8; font-family: monospace; font-size: 0.82rem; padding: 0.85rem; border-radius: 6px;">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger btn-sm" onclick="disconnectRemoteAssist()">🔴 Termina Sessione Remota</button>
       </div>
     </div>
   </div>
